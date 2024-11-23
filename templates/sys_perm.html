@@ -79,11 +79,9 @@
                 if(data[i].itens.length == 0){
                     const perm = new Object
                     perm.label = 'Permissões'
-                    perm.link = ()=>{
-                                                    
-                            openHTML('sys_view_perm.html','pop-up',`Controle de Permissão - ${data[i].modulo}`,summary,800)
-                        }
-            
+                    perm.link = ()=>{          
+                        openHTML('sys_view_perm.html','pop-up',`Controle de Permissão - ${data[i].modulo}`,summary,800)
+                    }
                     tbl.push(perm)
                 }
 
@@ -98,19 +96,11 @@
                 up.label = 'Subir no menu'
                 up.link = ()=>{
                     if(i>0){
-                        const out = []
-                        const item = data[i]
-                        data.splice(i,1)
-                        for(let j=0; j<data.length; j++){
-                            if(j==i-1){
-                               out.push(item)
-                            }
-                            out.push(data[j])
-                        }
-                        pageData.json.itens = out
+                        data.splice(i-1,0,data[i])
+                        data.splice(i+1,1)
+                        pageFunc.setMenu(JSON.stringify(pageData.json))
+                        pageFunc.refreshMenu()
                     }
-                    pageFunc.refreshMenu()
-                    pageFunc.setMenu(JSON.stringify(pageData.json))
                 }            
                 tbl.push(up)
                 menuContext(tbl,e)

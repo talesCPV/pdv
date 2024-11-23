@@ -22,7 +22,6 @@
             </div>
         </fieldset>
 
-
         <fieldset id="fdsUser">
             <legend>Usuários</legend>
             <table id="tblUser"></table>
@@ -62,7 +61,6 @@
     pageScreen.querySelector('#btnNovoUser').addEventListener('click',()=>{
         openHTML('sys_view_user.html','pop-up','Novo Usuario',{'id':'0'},800)
     })
-    
 
     pageScreen.querySelector('#tblUser').addEventListener('click',(e)=>{
         data = e.target.parentNode.data

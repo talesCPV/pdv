@@ -118,7 +118,7 @@
     .inline{
         display: flex;
  /*       padding: 10px;*/
-        align-items: center;        
+        align-items: baseline;        
     }
 
     .inline input, select, textarea{
@@ -130,7 +130,8 @@
 /*        border-color: currentcolor currentcolor black;*/
         border-image: none;
         background-color: unset;
-        padding-bottom: 5px;
+        padding-bottom: 0;
+        margin-bottom: 0px;
     }
 
     .inline input:focus, select:focus, textarea:focus{
@@ -164,7 +165,7 @@
         text-align: right;
         width: auto;
        /* align-self: flex-end;*/
-        padding: 10px;
+        padding: 0 10px;
         white-space: nowrap;
     }
 
@@ -183,7 +184,7 @@
     .line-ckb{
         display: flex;
         flex-direction: row;
-        align-items: center;
+/*        align-items: center;*/
         min-width: unset !important;
     }
 
@@ -281,6 +282,10 @@
             flex-direction: column;
             gap: 0;
             margin-top: 10px;
+        }
+
+        .line-ckb{
+            align-items: center;
         }
 
         .modal-content{

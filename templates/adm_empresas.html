@@ -65,6 +65,7 @@
         if(row.rowIndex > 0 && row.tagName == 'TR'){
             try{
                 closeModal('adm_view_emp')
+                row.data.callback = pageFunc.fillEmp
                 row.data != undefined ? openHTML('adm_view_emp.html','pop-up',`Edição de dados - ${row.data.razao_social.toUpperCase()}`,row.data) : null
             }catch{
                 console.error('no')

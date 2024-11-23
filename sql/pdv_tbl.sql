@@ -72,3 +72,26 @@ CREATE TABLE tb_empresa(
     PRIMARY KEY (id)
 ) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;
 
+/* PRODUTOS */
+
+DROP TABLE tb_produto;
+CREATE TABLE tb_produto(
+    id int(11) NOT NULL AUTO_INCREMENT,
+    id_emp int(11) DEFAULT NULL,
+    descricao varchar(80) NOT NULL,
+    estoque double DEFAULT 0,
+    estq_min double DEFAULT 0,
+    und varchar(10) DEFAULT "UND",
+    ncm varchar(8) DEFAULT NULL,
+	cod_int int(11) DEFAULT NULL,
+    cod_bar varchar(15) DEFAULT NULL,
+    cod_forn varchar(20) DEFAULT NULL,
+    consumo BOOLEAN DEFAULT 0,
+    custo double DEFAULT 0,
+    markup double DEFAULT 0,
+    local varchar(20),
+    disponivel boolean DEFAULT 1,
+    UNIQUE KEY (descricao),
+    FOREIGN KEY (id_emp) REFERENCES tb_empresa(id),
+    PRIMARY KEY (id)
+) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;

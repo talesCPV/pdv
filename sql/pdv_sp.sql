@@ -411,3 +411,24 @@ DELIMITER $$
 		END IF;
 	END $$
 DELIMITER ;
+
+/* TB PRODUTO */
+
+ DROP PROCEDURE IF EXISTS sp_view_prod;
+DELIMITER $$
+	CREATE PROCEDURE sp_view_prod(	
+		IN Iallow varchar(80),
+		IN Ihash varchar(64),
+		IN Ifield varchar(30),
+        IN Isignal varchar(4),
+		IN Ivalue varchar(50)
+    )
+	BEGIN
+		CALL sp_allow(Iallow,Ihash);
+		IF(@allow)THEN
+			SET @quer =CONCAT('SELECT * FROM vw_prod WHERE ',Ifield,' ',Isignal,' ',Ivalue,' ORDER BY ',Ifield,';');
+			PREPARE stmt1 FROM @quer;
+			EXECUTE stmt1;
+        END IF;
+	END $$
+DELIMITER ; 

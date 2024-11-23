@@ -125,34 +125,6 @@ function uploadImage(fileID,path,filename){
     return myPromisse
 }
 
-function listNF(path,ext='txt'){
-
-    const data = new URLSearchParams()
-        data.append("dir",path)
-        data.append("ext",ext)
-    const myRequest = new Request("backend/show_dir.php",{
-        method : "POST",
-        body : data
-    })
-    const myPromisse = new Promise((resolve,reject) =>{
-        fetch(myRequest)
-        .then(function (response){
-            if (response.status === 200) {
-                resolve(response.text())
-            } else {
-                reject(new Error("Houve algum erro na comunicação com o servidor"))
-            }
-        })
-    })
-    myPromisse.then((txt)=>{
-        const list = JSON.parse(txt)
-        const sel = document.querySelector(`#${ext}Files`)
-        sel.innerHTML=''
-        for(let i=list.length-1; i>1;  i--){
-            sel.innerHTML += `<option value="${list[i]}">${list[i]}</option>`
-        }
-    })
-}
 
 function getFile(path){
     const data = new URLSearchParams();        
