@@ -90,7 +90,7 @@
             <label for="edtCEP">CEP</label>
             <input type="text" class="only-view" id="edtCEP" maxlength="10" onkeyup="valCEP(this)" inputmode="numeric" style="width: 200px;" disabled>
             <label for="edtTel">Tel</label>
-            <input type="text" class="only-view" id="edtTel" onkeyup="valTel(this)" maxlength="15" inputmode="numeric" style="width: 200px;" disabled>            
+            <input type="text" class="only-view" id="edtTel" onkeyup="valFone(this)" maxlength="15" inputmode="numeric" style="width: 200px;" disabled>            
         </div>
         <div class="inline">
             <label for="edtMail">Email</label>
@@ -134,7 +134,7 @@
             pageScreen.querySelector('#cmbUF').value = pageData.uf
             pageScreen.querySelector('#edtBairro').value = pageData.bairro
             pageScreen.querySelector('#edtCEP').value = pageData.cep
-            pageScreen.querySelector('#edtTel').value = pageData.tel
+            pageScreen.querySelector('#edtTel').value = getFone(pageData.tel)
             pageScreen.querySelector('#edtMail').value = pageData.email
             pageScreen.querySelector('#btnEdit').disabled = 0
         }

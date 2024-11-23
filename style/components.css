@@ -134,6 +134,20 @@
         font-size: 1.5em;
     }
 
+    .web-input{
+        outline: none;
+        border-width: medium medium 1px;
+        border-style: none none solid;
+        border-color: currentcolor currentcolor black;
+        border-image: none;
+        background-color: unset;
+        padding-bottom: 5px;
+    }
+
+    .web-input:focus{
+        border-color: currentcolor currentcolor rgb(70, 70, 70);
+    }
+
 /* RISCK */
 
     .risk{

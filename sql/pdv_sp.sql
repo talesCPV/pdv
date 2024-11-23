@@ -136,7 +136,7 @@ DELIMITER $$
 	BEGIN    
 		CALL sp_allow(Iallow,Ihash);
 		IF(@allow)THEN
-			SET @quer =CONCAT('SELECT id,email,access, IF(access=0,"ROOT",IFNULL((SELECT nome FROM tb_usr_perm_perfil WHERE USR.access = id),"DESCONHECIDO")) AS perfil FROM tb_usuario AS USR WHERE ',Ifield,' ',Isignal,' ',Ivalue,' ORDER BY ',Ifield,';');
+			SET @quer =CONCAT('SELECT * FROM vw_usuario WHERE ',Ifield,' ',Isignal,' ',Ivalue,' ORDER BY ',Ifield,';');
 			PREPARE stmt1 FROM @quer;
 			EXECUTE stmt1;
 		ELSE 

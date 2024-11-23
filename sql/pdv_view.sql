@@ -8,4 +8,12 @@ CREATE VIEW vw_hora_dia AS
 		UNION ALL SELECT 18 UNION ALL SELECT 19 UNION ALL SELECT 20 UNION ALL SELECT 11
 		UNION ALL SELECT 22 UNION ALL SELECT 23;
 
-SELECT * FROM vw_hora_dia;
+	SELECT * FROM vw_hora_dia;
+
+DROP VIEW IF EXISTS vw_usuario;
+CREATE VIEW vw_usuario AS
+	SELECT id,email,access,nome,cadastro,expira,
+	IF(access=0,"ROOT",IFNULL((SELECT nome FROM tb_usr_perm_perfil WHERE USR.access = id),"DESCONHECIDO")) AS perfil 
+	FROM tb_usuario AS USR;
+
+SELECT * FROM vw_usuario;

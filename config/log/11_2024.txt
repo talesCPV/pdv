@@ -98,3 +98,5 @@
 22/11/2024 21:50 admin@backhand.com.br : Menu Alterado (Fornecedores, adm_empresas, pop-up, Fornecedores)
 22/11/2024 21:51 admin@backhand.com.br : Menu Alterado (Fornecedores, adm_empresas.html, pop-up, Fornecedores)
 22/11/2024 21:55 admin@backhand.com.br : Menu Alterado (Adicionar Creditos, pn3_creditos.html, web-window, Creditos)
+23/11/2024 01:41 tales@planet3.com.br : Empresa Cadastrada  -> Empresa Teste
+23/11/2024 01:42 tales@planet3.com.br : Empresa Editada Empresa Teste -> Empresa Teste
