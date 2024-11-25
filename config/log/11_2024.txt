@@ -126,3 +126,8 @@
 23/11/2024 20:04 tales@planet3.com.br : Menu Incluido (Unidades)
 23/11/2024 20:06 tales@planet3.com.br : Menu Alterado (Parametros, menu, pop-up, )
 23/11/2024 20:08 tales@planet3.com.br : Menu Alterado (Unidades, adm_unidades.html, pop-up, Unidades)
+25/11/2024 12:50 tales@planet3.com.br : Menu Incluido (Cardapio)
+25/11/2024 12:51 tales@planet3.com.br : Menu Alterado (Cardapio, menu, pop-up, Itens do Cardapio)
+25/11/2024 12:53 tales@planet3.com.br : Menu Alterado (Unidades, par_unidades.html, pop-up, Unidades)
+25/11/2024 12:53 tales@planet3.com.br : Menu Alterado (Cardapio, par_cardapio.html, pop-up, Itens do Cardapio)
+25/11/2024 13:20 tales@planet3.com.br : Menu Alterado (Unidades, par_unidades.html, pop-up, Unidades)
