@@ -162,10 +162,9 @@
     }
 
     .inline label{
-        text-align: right;
+        text-align: start;
         width: auto;
-       /* align-self: flex-end;*/
-        padding: 0 10px;
+        padding: 0px 20px;
         white-space: nowrap;
     }
 

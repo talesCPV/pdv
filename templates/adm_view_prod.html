@@ -20,6 +20,11 @@
             border: solid 1px;
             border-radius: 10px;
             padding: 5px;
+            max-height: 300px;
+        }
+
+        .pic > canvas{
+            max-height: 200px;
         }
 
         .side-pic{
@@ -93,24 +98,25 @@
                 <div class="inline">
                     <label for="edtNCM">NCM</label>
                     <input type="text" class="only-view" id="edtNCM" maxlength="8" onkeyup="valInt(this)" inputmode="numeric" disabled>
-                </div>               
+                </div>
+                <div class="inline">
+                    <label for="edtCodFW">Código</label>
+                    <input type="text" class="only-view" id="edtCodFW" maxlength="20" disabled>
+                    <label for="edtCodForn">Cód. Forn.</label>
+                    <input type="text" class="only-view" id="edtCodForn" maxlength="20" disabled>
+                </div>
+                <div class="inline">
+                    <label for="edtCodBar">Cód. Barra</label>
+                    <input type="text" class="only-view" id="edtCodBar" maxlength="20" inputmode="numeric" disabled>        
+                    <label for="cmbCons">Consumo</label>
+                    <select id="cmbCons" class="only-view" disabled>
+                        <option value="1">SIM</option>
+                        <option value="0" selected>NÃO</option>
+                    </select>
+                </div>
             </div>
         </div>
-        <div class="inline">
-            <label for="edtCodFW">Código</label>
-            <input type="text" class="only-view" id="edtCodFW" maxlength="20" disabled>
-            <label for="edtCodForn">Cód. Forn.</label>
-            <input type="text" class="only-view" id="edtCodForn" maxlength="20" disabled>
-        </div>
-        <div class="inline">
-            <label for="edtCodBar">Cód. Barra</label>
-            <input type="text" class="only-view" id="edtCodBar" maxlength="20" inputmode="numeric" disabled>        
-            <label for="cmbCons">Consumo</label>
-            <select id="cmbCons" class="only-view" disabled>
-                <option value="1">SIM</option>
-                <option value="0" selected>NÃO</option>
-            </select>
-        </div>
+
         <div class="inline">
             <label for="cmdUnd">Unidade</label>
             <select id="cmdUnd" class="only-view" disabled></select>
@@ -134,12 +140,7 @@
                 </div>
                 <div class="inline">
                     <label for="cmbTipo">Tipo</label>
-                    <select id="cmbTipo" class="only-view" disabled>
-                        <option value="BEBIDAS">Bebidas</option>
-                        <option value="COMIDAS">Comidas</option>
-                        <option value="PORÇÕES">Porções</option>
-                        <option value="PESCA">Pesca</option>
-                    </select>
+                    <select id="cmbTipo" class="only-view" disabled></select>
                 </div>
             </fieldset>            
         </div>         
@@ -156,15 +157,19 @@
     const pageData = main_data.adm_view_prod.data
     const pageFunc = main_data.adm_view_prod.func
     const pageScreen = document.querySelector('#card-adm_view_prod')
-    const newProd = Object.keys(pageData).length == 0
+    const newReg = Object.keys(pageData).length == 0
 
     function pageStart(){
+        getFile('/../config/params/params.json').then((response)=>{
+            pageData.params = JSON.parse(response)
+            fillParams()
+        })  
+
+        openFields(newReg)
         fillEmp()
-        fillUnd()
-        if(newProd){
-            openFields(1)
+        loadFoto()
+        if(newReg){
             pageScreen.querySelector('#btnDel').disabled = 1
-            pageScreen.querySelector('#btnEdit').disabled = 1
             pageScreen.querySelector('#up_file').disabled = 1
         }else{
             pageScreen.querySelector('#edtDesc').value = pageData.descricao
@@ -179,15 +184,8 @@
             pageScreen.querySelector('#edtMarkup').value = pageData.markup
             pageScreen.querySelector('#edtLocal').value = pageData.local
             pageScreen.querySelector('#edtNCM').value = pageData.ncm
-            pageScreen.querySelector('#ckbDisp').checked = parseInt(pageData.disp)
+            pageScreen.querySelector('#ckbDisp').checked = parseInt(pageData.disponivel)
             pageScreen.querySelector('#cmbTipo').value = pageData.tipo
-            pageScreen.querySelector('#btnEdit').disabled = 0
-
-            const back = backFunc({'filename':`../assets/prod/prod_${pageData.id}.jpg`},1)
-            back.then((resp)=>{
-                const imgExist = JSON.parse(resp)    
-                loadImg( imgExist ? `assets/prod/prod_${pageData.id}.jpg` : 'assets/prod/noimage.jpg')
-            })            
         }
     }
 
@@ -205,7 +203,7 @@
                 const opt = document.createElement('option')
                 opt.value = json[i].id
                 opt.innerHTML = json[i].fantasia
-                if(!newProd){
+                if(!newReg){
                     opt.selected =  json[i].id == pageData.id_emp ? 1 : 0
                 }
                 cmb.appendChild(opt)
@@ -213,23 +211,38 @@
         })
     }
 
-    function fillUnd(){
-        getFile('/../config/params/und.json').then((resolve)=>{
-            const json = JSON.parse(resolve)
-            const cmb = pageScreen.querySelector('#cmdUnd')
-            cmb.innerHTML=''
-            for (const [key, value] of Object.entries(json)) {
-                const opt = document.createElement('option')
-                opt.value = value
-                opt.innerHTML = key
-                if(!newProd){
-                    opt.selected =  value == pageData.und ? 1 : 0
-                }
-                cmb.appendChild(opt)
+    function fillParams(){
+        const cmbUnd = pageScreen.querySelector('#cmdUnd')
+        cmbUnd.innerHTML=''
+        for (const [key, value] of Object.entries(pageData.params.und)) {
+            const opt = document.createElement('option')
+            opt.value = value
+            opt.innerHTML = key
+            if(!newReg){
+                opt.selected = opt.value == pageData.und ? 1 : 0
             }
+            cmbUnd.appendChild(opt)
+        }
 
-        })   
+        const cmbTipo = pageScreen.querySelector('#cmbTipo')
+        cmbTipo.innerHTML=''
+        for (let i=0; i<pageData.params.item_cardapio.length; i++) {
+            const opt = document.createElement('option')
+            opt.value = pageData.params.item_cardapio[i].toUpperCase()
+            opt.innerHTML = pageData.params.item_cardapio[i]
+            if(!newReg){
+                opt.selected = opt.value == pageData.tipo ? 1 : 0
+            }
+            cmbTipo.appendChild(opt)
+        }
+    }
 
+    function loadFoto(){
+        const back = backFunc({'filename':`../assets/prod/prod_${pageData.id}.jpg`},1)
+        back.then((resp)=>{
+            const imgExist = JSON.parse(resp)    
+            loadImg( imgExist ? `assets/prod/prod_${pageData.id}.jpg` : 'assets/prod/noimage.jpg')
+        })  
     }
 
     function openFields(open=1){
@@ -237,13 +250,14 @@
         for(let i=0; i<view.length; i++){
             view[i].disabled = !open
         }
+        pageScreen.querySelector('#btnEdit').disabled = open
     }
 
-    pageFunc.setProd = ()=>{
+    pageFunc.setProd = (del=0)=>{
         const params = new Object;
-            params.id = newProd ? 0 : pageData.id
+            params.id = newReg ? 0 : pageData.id
             params.id_emp = pageScreen.querySelector('#cmbForn').value
-            params.descricao = pageScreen.querySelector('#edtDesc').value.trim()
+            params.descricao = del ? '' : pageScreen.querySelector('#edtDesc').value.trim()
             params.estoque = pageScreen.querySelector('#edtEtq').value.trim()
             params.estq_min = pageScreen.querySelector('#edtEtqMin').value.trim()
             params.und = pageScreen.querySelector('#cmdUnd').value
@@ -260,7 +274,7 @@
           
         const myPromisse = queryDB(params,'PROD-1');
         myPromisse.then((resolve)=>{            
-            setLog(`Produto ${newProd?'Cadastrado':'Editado'} ${ !newProd ? pageData.descricao :''} -> ${params.descricao}`)
+            setLog(`Produto ${newReg?'Cadastrado':'Editado'} ${ !newReg ? pageData.descricao :''} -> ${params.descricao}`)
             try{
                 main_data.adm_produtos.func.fillProd()
             }catch{
@@ -271,24 +285,6 @@
         })
     }
 
-    pageFunc.delProd = ()=>{
-        if(confirm('Deseja realmente deletar este produto?')){
-            const params = new Object;
-                params.id = pageData.id
-            
-            const myPromisse = queryDB(params,'PROD-2');
-            myPromisse.then((resolve)=>{
-                setLog(`Produto Deletado -> ${pageData.descricao}`)
-                try{
-                    main_data.adm_produtos.func.fillProd()
-                }catch{
-                    console.error('Tela fechada pelo usuário!')
-                }
-                closeModal('adm_view_prod')
-            })
-        }
-    }
-
     pageScreen.querySelector('#btnSave').addEventListener('click',()=>{
         if(checkField(['edtDesc','edtCusto','edtMarkup'])){
             pageFunc.setProd()
@@ -296,7 +292,9 @@
     })
 
     pageScreen.querySelector('#btnDel').addEventListener('click',()=>{
-        pageFunc.delProd()
+        if(confirm('Deseja realmente deletar este produto?')){
+            pageFunc.setProd(1)
+        }
     })
 
     pageScreen.querySelector('#btnEdit').addEventListener('click',()=>{

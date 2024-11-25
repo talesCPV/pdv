@@ -18,31 +18,36 @@
 
     function pageStart(){
         
-        getFile('/../config/params/item_cardap.json').then((response)=>{
-            fillItens(response)
+        getFile('/../config/params/params.json').then((response)=>{
+            pageData.params = JSON.parse(response)
+            try{
+                pageData.params.item_cardapio = pageData.params.item_cardapio == undefined ? new Object : pageData.params.item_cardapio
+            }catch{
+                pageData.params.item_cardapio = []
+            }
+            fillItens()
         })        
     }
 
-    function fillItens(response){
-        pageData.itens = JSON.parse(response)
+    function fillItens(){
         const tbl = pageScreen.querySelector('#tblItem')
         tbl.head('Nome')
         let i=0
-        for (let i=0; i<pageData.itens.length; i++) {
-            tbl.plot({item:pageData.itens[i], index:i},`item`,'Upp')
+        for (let i=0; i<pageData.params.item_cardapio.length; i++) {
+            tbl.plot({item:pageData.params.item_cardapio[i], index:i},`item`,'Upp')
         }
     }
 
     function saveItem(){
-        saveFile(pageData.itens,'/../config/params/item_cardap.json').then((resolve)=>{        
-            fillItens(resolve)
+        saveFile(pageData.params,'/../config/params/params.json').then((resolve)=>{        
+            fillItens()
         })
     }
 
     pageScreen.querySelector('#btnAdd').addEventListener('click',()=>{
         const nome = prompt('Nome do Ítem:')
         if(nome){
-            pageData.itens.push(nome)
+            pageData.params.item_cardapio.push(nome)
         }
         saveItem()
     })
@@ -54,9 +59,9 @@
         const edt = new Object
         edt.label = 'Editar'
         edt.link = ()=>{
-            const nome = prompt('Nome do Ítem:',pageData.itens[data.index])
+            const nome = prompt('Nome do Ítem:',pageData.params.item_cardapio[data.index])
             if(nome){
-                pageData.itens[data.index] = nome
+                pageData.params.item_cardapio[data.index] = nome
                 saveItem()
             }
         }            
@@ -66,7 +71,7 @@
         del.label = 'Deletar'
         del.link = ()=>{
             if(confirm('Deletar este ítem do cardápio?')){
-                pageData.itens.splice(data.index,1)
+                pageData.params.item_cardapio.splice(data.index,1)
                 saveItem()
             }
         }            

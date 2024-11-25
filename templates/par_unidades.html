@@ -18,34 +18,38 @@
 
     function pageStart(){
         
-        getFile('/../config/params/und.json').then((response)=>{
-            fillUnd(response)
+        getFile('/../config/params/params.json').then((response)=>{            
+            pageData.params = JSON.parse(response)
+            try{
+                pageData.params.und = pageData.params.und == undefined ? new Object : pageData.params.und
+            }catch{
+                pageData.params.und = new Object
+            }
+            fillUnd()
         })        
     }
 
-    function fillUnd(response){
-        const json = JSON.parse(response)
-        pageData.und = new Object
+    function fillUnd(){
         const tbl = pageScreen.querySelector('#tblUND')
         tbl.head('Nome,Sigla')
         let i=0
-        for (const [key, value] of Object.entries(json)) {
-            pageData.und[key] = value
+        for (const [key, value] of Object.entries(pageData.params.und)) {
+            pageData.params.und[key] = value
             tbl.plot({key:key, value:value, index:i},`key,value`,'str,Upp')
             i++
         }
     }
 
     function saveUnd(){
-        saveFile(pageData.und,'/../config/params/und.json').then((resolve)=>{        
-            fillUnd(resolve)
+        saveFile(pageData.params,'/../config/params/params.json').then((resolve)=>{        
+            fillUnd()
         })
     }
 
     pageScreen.querySelector('#btnAdd').addEventListener('click',()=>{
         const nome = prompt('Nome da Unidade:')
         const sigla = prompt('Sigla:')
-        pageData.und[nome] = sigla     
+        pageData.params.und[nome] = sigla     
         saveUnd()
     })
 
@@ -56,10 +60,10 @@
         const edt = new Object
         edt.label = 'Editar'
         edt.link = ()=>{
-            const nome = prompt('Nome da Unidade:',pageData.und[data.key])
-            const sigla = prompt('Sigla:',pageData.und[data.value])
-            delete pageData.und[data.key]
-            pageData.und[nome] = sigla
+            const nome = prompt('Nome da Unidade:',pageData.params.und[data.key])
+            const sigla = prompt('Sigla:',pageData.params.und[data.value])
+            delete pageData.params.und[data.key]
+            pageData.params.und[nome] = sigla
             saveUnd()
         }            
         tbl.push(edt)
@@ -67,7 +71,7 @@
         const del = new Object
         del.label = 'Deletar'
         del.link = ()=>{
-            delete pageData.und[data.key]
+            delete pageData.params.und[data.key]
             saveUnd()
         }            
         tbl.push(del)

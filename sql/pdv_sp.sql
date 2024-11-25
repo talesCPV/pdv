@@ -432,3 +432,44 @@ DELIMITER $$
         END IF;
 	END $$
 DELIMITER ; 
+
+ DROP PROCEDURE IF EXISTS sp_set_prod;
+DELIMITER $$
+	CREATE PROCEDURE sp_set_prod(	
+		IN Iallow varchar(80),
+		IN Ihash varchar(64),
+        IN Iid int(11),
+		IN Iid_emp int(11),
+		IN Idescricao varchar(80),
+		IN Iestoque double,
+		IN Iestq_min double,
+		IN Iund varchar(10),
+		IN Incm varchar(8),
+		IN Icod_int int(11),
+		IN Icod_bar varchar(15),
+		IN Icod_forn varchar(20),
+		IN Iconsumo BOOLEAN,
+        IN Icusto double,
+		IN Imarkup double,
+        IN Ilocal varchar(20),
+        IN Idisp BOOLEAN
+    )
+	BEGIN
+		CALL sp_allow(Iallow,Ihash);
+		IF(@allow)THEN
+			IF(Iid = 0)THEN
+				INSERT INTO tb_produto (id_emp,descricao,estoque,estq_min,und,ncm,cod_int,cod_bar,cod_forn,consumo,custo,markup,local,disponivel)
+				VALUES (Iid_emp,Idescricao,Iestoque,Iestq_min,Iund,Incm,Icod_int,Icod_bar,Icod_forn,Iconsumo,Icusto,Imarkup,Ilocal,Idisp);
+            ELSE
+				IF(Idescricao = "")THEN
+					DELETE FROM tb_produto WHERE id=Iid;
+                ELSE
+					UPDATE tb_produto 
+                    SET id_emp=Iid_emp,descricao=Idescricao,estoque=Iestoque,estq_min=Iestq_min,und=Iund,ncm=Incm,cod_int=Icod_int,
+					cod_bar=Icod_bar,cod_forn=Icod_forn,consumo=Iconsumo,custo=Icusto,markup=Imarkup,local=Ilocal,disponivel=Idisp
+                    WHERE id=Iid;
+                END IF;
+            END IF;
+        END IF;
+	END $$
+DELIMITER ;
