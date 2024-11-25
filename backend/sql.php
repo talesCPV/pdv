@@ -42,8 +42,9 @@
        "PROD-0"  => 'CALL sp_view_prod(@access,@hash,"x00","x01","x02");', // FIELD,SIGNAL, VALUE
        "PROD-1"  => 'CALL sp_set_prod(@access,@hash,x00,"x01","x02","x03","x04","x05","x06","x07","x08","x09",x10,"x11","x12","x13","x14");', //ID,ID_EMP,DESCRIÇÃO,ESTOQUE,ESTQ_MIN,UND,NCM,COD_INT,COD_BAR,COD_FORN,CONSUMO,CUSTO,MARKUP,LOCAL,DISPONIVEL
 
-       "PROD-4"  => 'CALL sp_inventario(@access,@hash,x00,"x01","x02")', // ID_PROD, QTD, OPERAÇÃO
-       "PROD-5"  => 'CALL sp_view_consumo(@access,@hash,"x00","x01");', // DT_INICIO, DT_FINAL
+        /* CLIENTES */
+        "CLI-0" => 'CALL sp_view_cliente(@access,@hash,"x00","x01","x02");', // FIELD, SIGNAL, VALUE
+        "CLI-1" => 'CALL sp_set_cliente(@access,@hash,"x00","x01","x02","x03","x04","x05");', //  ID,NOME,CPF,CEL.SALDO,OBS
 
 
     );

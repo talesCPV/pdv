@@ -473,3 +473,63 @@ DELIMITER $$
         END IF;
 	END $$
 DELIMITER ;
+
+/* CLIENTE */
+
+ DROP PROCEDURE IF EXISTS sp_view_cliente;
+DELIMITER $$
+	CREATE PROCEDURE sp_view_cliente(
+		IN Iallow varchar(80),
+		IN Ihash varchar(64),
+		IN Ifield varchar(30),
+        IN Isignal varchar(4),
+		IN Ivalue varchar(50)
+    )
+	BEGIN
+		CALL sp_allow(Iallow,Ihash);
+		IF(@allow)THEN
+			SET @quer =CONCAT('SELECT * FROM tb_cliente WHERE ',Ifield,' ',Isignal,' ',Ivalue,' ORDER BY nome;');
+			PREPARE stmt1 FROM @quer;
+			EXECUTE stmt1;
+        END IF;
+	END $$
+	DELIMITER ;        
+    
+	DROP PROCEDURE IF EXISTS sp_set_cliente;
+	DELIMITER $$
+	CREATE PROCEDURE sp_set_cliente(
+		IN Iallow varchar(80),
+		IN Ihash varchar(64),
+        IN Iid int(11),
+		IN Inome varchar(50),
+		IN Icpf varchar(12),
+		IN Icel varchar(15),
+		IN Isaldo double,
+		IN Iobs varchar(255)
+    )
+	BEGIN
+		CALL sp_allow(Iallow,Ihash);
+		IF(@allow)THEN
+			SET @cpf = (SELECT COUNT(*) FROM tb_cliente WHERE cpf COLLATE utf8_general_ci = Icpf COLLATE utf8_general_ci);
+            IF(@cpf = 0)THEN
+				IF(Iid=0)THEN
+					INSERT INTO tb_cliente (nome,cpf,cel,saldo,obs)
+					VALUES (Inome,Icpf,Icel,Isaldo,Iobs);
+					SELECT "Cliente cadastrado com sucesso!" AS MESSAGE, Iid AS id_cliente;
+                ELSE
+					IF(Inome="")THEN
+						DELETE FROM tb_cliente WHERE id=Iid;
+						SELECT "Cliente deletado com sucesso!" AS MESSAGE, Iid AS id_cliente;
+                    ELSE
+						UPDATE tb_cliente 
+                        SET nom=Inome,cpf=Icpf,cel=Icel,saldo=Isaldo,obs=Iobs
+                        WHERE id=Iid;
+						SELECT "Cliente editado com sucesso!" AS MESSAGE, @id AS id_cliente;
+                    END IF;
+                END IF;
+			ELSE
+				SELECT "Cliente já cadastrado!, verificar o CPF" AS MESSAGE,0 AS id_cliente;
+            END IF;
+        END IF;
+	END $$
+	DELIMITER ;     

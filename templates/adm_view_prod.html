@@ -80,36 +80,36 @@
         <div class="top-form">
             <div class="pic">
                 <canvas id="cnvImg"></canvas>
-                <input  name="up_file" id="up_file" type="file" accept=".jpg,.jpeg" class="only-view" disabled>            
+                <input  name="up_file" id="up_file" type="file" accept=".jpg,.jpeg" class="only-view" onfocus="this.select();" disabled>            
             </div>
             <div class="side-pic">
                 <div class="inline">
                     <label for="edtDesc">Descrição *</label>
-                    <input type="text" class="only-view" id="edtDesc" maxlength="80" disabled>
+                    <input type="text" class="only-view" id="edtDesc" maxlength="80" onfocus="this.select();" disabled>
                 </div>
                 <div class="inline">
                     <label for="cmbForn">Fornecedor</label>
-                    <select id="cmbForn" class="only-view" disabled></select>   
+                    <select id="cmbForn" class="only-view" onfocus="this.select();" disabled></select>   
                 </div>
                 <div class="inline">
                     <label for="edtLocal">Local</label>
-                    <input type="text" class="only-view" id="edtLocal" maxlength="20" disabled>
+                    <input type="text" class="only-view" id="edtLocal" maxlength="20" onfocus="this.select();" disabled>
                 </div>
                 <div class="inline">
                     <label for="edtNCM">NCM</label>
-                    <input type="text" class="only-view" id="edtNCM" maxlength="8" onkeyup="valInt(this)" inputmode="numeric" disabled>
+                    <input type="text" class="only-view" id="edtNCM" maxlength="8" onkeyup="valInt(this)" inputmode="numeric" onfocus="this.select();" disabled>
                 </div>
                 <div class="inline">
                     <label for="edtCodFW">Código</label>
-                    <input type="text" class="only-view" id="edtCodFW" maxlength="20" disabled>
+                    <input type="text" class="only-view" id="edtCodFW" maxlength="20" onfocus="this.select();" disabled>
                     <label for="edtCodForn">Cód. Forn.</label>
-                    <input type="text" class="only-view" id="edtCodForn" maxlength="20" disabled>
+                    <input type="text" class="only-view" id="edtCodForn" maxlength="20" onfocus="this.select();" disabled>
                 </div>
                 <div class="inline">
                     <label for="edtCodBar">Cód. Barra</label>
-                    <input type="text" class="only-view" id="edtCodBar" maxlength="20" inputmode="numeric" disabled>        
+                    <input type="text" class="only-view" id="edtCodBar" maxlength="20" inputmode="numeric" onfocus="this.select();" disabled>        
                     <label for="cmbCons">Consumo</label>
-                    <select id="cmbCons" class="only-view" disabled>
+                    <select id="cmbCons" class="only-view" onfocus="this.select();" disabled>
                         <option value="1">SIM</option>
                         <option value="0" selected>NÃO</option>
                     </select>

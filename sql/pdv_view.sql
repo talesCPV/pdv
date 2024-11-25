@@ -25,7 +25,8 @@ SELECT * FROM vw_usuario;
         ROUND(((PROD.markup/100 + 1)*PROD.custo),2) AS preco
     FROM
         tb_produto AS PROD
-        JOIN tb_empresa AS FORN
-		ON FORN.id = PROD.id;
-
- SELECT * FROM vw_prod;   
+	JOIN tb_empresa AS FORN
+	ON FORN.id = PROD.id_emp
+	GROUP BY PROD.id;
+    
+ SELECT * FROM vw_prod;
