@@ -76,7 +76,7 @@
                 params.saldo = pageScreen.querySelector('#edtSaldo').value.trim()
                 params.obs = pageScreen.querySelector('#edtObs').value.trim()
             
-            const myPromisse = queryDB(params,'CXA-2');
+            const myPromisse = queryDB(params,'CLI-1');
             myPromisse.then((resolve)=>{
                 const resp = JSON.parse(resolve)[0]
                 setLog(`${newReg?'Novo Cliente':'Edição de Cliente'} Nome: ${params.nome}, CPF: ${params.cpf}, Cel: ${params.cel}, Saldo: ${params.saldo}, Obs: ${params.obs}`)
@@ -89,8 +89,18 @@
                     }
 
                 alert(resp.MESSAGE)
-                closeModal('adm_new_client')
+                closeModal('adm_view_cli')
             })
+        }
+    })
+
+    pageScreen.querySelector('#btnEdit').addEventListener('click',()=>{
+        if(pageScreen.querySelector('#btnSave').disabled){
+            if(confirm('Abrir registro para edição?')){
+                openFields(pageScreen,1)
+            }
+        }else{
+            openFields(pageScreen,0)
         }
     })
 
