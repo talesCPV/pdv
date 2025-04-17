@@ -94,21 +94,20 @@
             params.field = query[0]
             params.signal = query[1]
             params.value = query[2]
-            params.dt_ini = '2000-01-01'
-            params.dt_fin = '2100-12-31'
+            params.dt_ini = '0000-01-01'
+            params.dt_fin = '9999-12-31'
         const myPromisse = queryDB(params,'CXA-0');
         myPromisse.then((resolve)=>{
             const json = JSON.parse(resolve)
-console.log(json)            
             tbl.style.display = json.length > 0 ? 'inline-table' : 'none'
-            tbl.head('Num.,Data|mobiHide,Hora|mobiHide,Cliente|w70,Valor')
+            tbl.head('Num.,Data|mobiHide,Hora|mobiHide,Cliente|w70,Valor,PG')
             for(let i=0; i<json.length;i++){
-                tbl.plot(json[i],'id,entrada|mobiHide,entrada|mobiHide,cliente,total','str,dat,hor,Upp,R$.')
+                tbl.plot(json[i],'id,entrada|mobiHide,entrada|mobiHide,cliente,total,aberta','str,dat,hor,Upp,R$.,cha 0=SIM 1=NÃO')
             }
             
         })
     }
-
+/*
     function printComanda(data){
         const qrcode = new QRCode("cli-code", {
             text:`https://www.flexibus.com.br/pesqueiro/index.html?token=${data.token.substr(0,30)}`,
@@ -143,7 +142,7 @@ console.log(json)
 //            printComanda(json[0])
         })        
     }
-
+*/
     pageFunc.newComanda = (id_cliente)=>{
         const params = new Object;
             params.id = 0
@@ -174,8 +173,9 @@ console.log(json)
 
     pageScreen.querySelector('#tblComandas').addEventListener('click',(e)=>{
         const row = e.target.parentNode
+        console.log(row.data)
         if(row.rowIndex > 0 && row.tagName == 'TR'){
-            openHTML('cxa_view_comanda.html','pop-up',`Comanda - ${row.data.id.padStart(8,0)} - ${row.data.nome.toUpperCase()}`,row.data)
+            openHTML('cxa_view_comanda.html','pop-up',`Comanda - ${row.data.id.padStart(5,0)} - ${row.data.cliente.toUpperCase()}`,row.data)
         }
     })
 

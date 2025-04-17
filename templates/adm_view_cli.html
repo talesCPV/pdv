@@ -20,11 +20,6 @@
         </div>
 
         <div class="inline">
-            <label for="edtSaldo">Saldo</label>
-            <input type="text" class="only-view" id="edtSaldo" value="0" onfocus="this.select();" >
-        </div>
-
-        <div class="inline">
             <label for="edtObs">Obs</label>
             <textarea id="edtObs" class="only-view" cols="30" rows="10" maxlength="255" onfocus="this.select();"></textarea>
         </div>        
@@ -51,10 +46,7 @@
             pageScreen.querySelector('#edtNome').value = pageData.nome
             pageScreen.querySelector('#edtCPF').value = getCPF(pageData.cpf)
             pageScreen.querySelector('#edtCel').value = getFone(pageData.cel)
-            pageScreen.querySelector('#edtSaldo').value = pageData.saldo
             pageScreen.querySelector('#edtObs').value = pageData.obs
-        }else{
-            pageScreen.querySelector('#edtSaldo').disabled = true
         }
     }
 
@@ -72,7 +64,6 @@
             params.nome = del ? '' : pageScreen.querySelector('#edtNome').value.trim()
             params.cpf = getNum(pageScreen.querySelector('#edtCPF').value.trim())
             params.cel = getNum(pageScreen.querySelector('#edtCel').value.trim())
-            params.saldo = pageScreen.querySelector('#edtSaldo').value.trim()
             params.obs = pageScreen.querySelector('#edtObs').value.trim()
         const myPromisse = queryDB(params,'CLI-1');
         myPromisse.then((resolve)=>{

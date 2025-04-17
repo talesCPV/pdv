@@ -33,10 +33,20 @@ SELECT * FROM vw_usuario;
  
   DROP VIEW vw_comanda;
  CREATE VIEW vw_comanda AS     
-	SELECT COM.*, CLI.nome AS cliente, ROUND(IFNULL((SELECT  SUM(qtd * val_unit) FROM tb_item_comanda WHERE id_comanda=COM.id),0),2) AS total
+	SELECT COM.*, CLI.nome AS cliente, CLI.cpf, CLI.cel,
+    ROUND(IFNULL((SELECT  SUM(qtd * val_unit) FROM tb_item_comanda WHERE id_comanda=COM.id),0),2) AS total
 		FROM tb_comanda AS COM
         INNER JOIN tb_cliente AS CLI
         ON COM.id_cliente = CLI.id
 		ORDER BY entrada DESC;
-        
+
  SELECT * FROM vw_comanda;
+
+ DROP VIEW vw_item_comanda;
+ CREATE VIEW vw_item_comanda AS  
+	SELECT ITN.*, PROD.preco, ROUND((ITN.qtd * PROD.preco),2) AS sub_total, PROD.descricao, PROD.und 
+    FROM tb_item_comanda AS ITN
+    INNER JOIN vw_prod AS PROD
+    ON ITN.id_produto = PROD.id;
+
+	SELECT * FROM vw_item_comanda;

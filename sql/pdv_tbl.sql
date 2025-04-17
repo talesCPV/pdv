@@ -104,7 +104,6 @@ CREATE TABLE tb_cliente (
   nome varchar(50) NOT NULL,
   cpf varchar(12) DEFAULT NULL,
   cel varchar(15) DEFAULT NULL,
-  saldo double NOT NULL DEFAULT 0,
   obs varchar(255) DEFAULT NULL,
   PRIMARY KEY (id)
 ) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;

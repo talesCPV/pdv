@@ -504,7 +504,6 @@ DELIMITER $$
 		IN Inome varchar(50),
 		IN Icpf varchar(12),
 		IN Icel varchar(15),
-		IN Isaldo double,
 		IN Iobs varchar(255)
     )
 	BEGIN
@@ -513,8 +512,8 @@ DELIMITER $$
 			IF(Iid=0)THEN
 				SET @cpf = (SELECT COUNT(*) FROM tb_cliente WHERE cpf COLLATE utf8_general_ci = Icpf COLLATE utf8_general_ci);
 				IF(@cpf = 0)THEN
-					INSERT INTO tb_cliente (nome,cpf,cel,saldo,obs)
-					VALUES (Inome,Icpf,Icel,Isaldo,Iobs);
+					INSERT INTO tb_cliente (nome,cpf,cel,obs)
+					VALUES (Inome,Icpf,Icel,Iobs);
 					SELECT "Cliente cadastrado com sucesso!" AS MESSAGE, Iid AS id_cliente;
 				ELSE
 					SELECT "Cliente já cadastrado!, verificar o CPF" AS MESSAGE,0 AS id_cliente;
@@ -525,7 +524,7 @@ DELIMITER $$
 					SELECT "Cliente deletado com sucesso!" AS MESSAGE, Iid AS id_cliente;
 				ELSE
 					UPDATE tb_cliente 
-					SET nome=Inome,cpf=Icpf,cel=Icel,saldo=Isaldo,obs=Iobs
+					SET nome=Inome,cpf=Icpf,cel=Icel,obs=Iobs
 					WHERE id=Iid;
 					SELECT "Cliente editado com sucesso!" AS MESSAGE, @id AS id_cliente;
 				END IF;
@@ -589,4 +588,19 @@ DELIMITER $$
             END IF;
         END IF;
 	END $$
-	DELIMITER ;      
+	DELIMITER ;
+    
+	DROP PROCEDURE IF EXISTS sp_view_item_comanda;
+DELIMITER $$
+	CREATE PROCEDURE sp_view_item_comanda(
+		IN Iallow varchar(80),
+		IN Ihash varchar(64),
+		IN Iid_comanda varchar(30)
+    )
+	BEGIN
+		CALL sp_allow(Iallow,Ihash);
+		IF(@allow)THEN
+			SELECT * FROM vw_item_comanda WHERE id_comanda=Iid_comanda;
+        END IF;
+	END $$
+	DELIMITER ;   

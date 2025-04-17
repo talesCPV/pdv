@@ -44,12 +44,14 @@
 
         /* CLIENTES */
         "CLI-0" => 'CALL sp_view_cliente(@access,@hash,"x00","x01","x02");', // FIELD, SIGNAL, VALUE
-        "CLI-1" => 'CALL sp_set_cliente(@access,@hash,"x00","x01","x02","x03","x04","x05");', //  ID,NOME,CPF,CEL.SALDO,OBS
+        "CLI-1" => 'CALL sp_set_cliente(@access,@hash,"x00","x01","x02","x03","x04");', //  ID,NOME,CPF,CEL,OBS
 
          /* CAIXA */
         "CXA-0" => 'CALL sp_view_comandas(@access,@hash,"x00","x01","x02","x03","x04");', // FIELD,SIGNAL, VALUE, DT_INI, DT_FIN
         "CXA-1" => 'CALL sp_set_comanda(@access,@hash,x00,x01,"x02");', // ID, ID_CLIENTE, OBS
+        "CXA-2" => 'CALL sp_view_item_comanda(@access,@hash,x00);', // ID_COMANDA
 
+        
 
 
     );
