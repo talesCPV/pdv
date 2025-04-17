@@ -66,31 +66,47 @@
         pageScreen.querySelector('#btnEdit').disabled = open
     }
 
-    document.querySelector('#btnSave').addEventListener('click',()=>{
+    function setCliente(del=0){
+        const params = new Object;
+            params.id = newReg ? 0 : pageData.id
+            params.nome = del ? '' : pageScreen.querySelector('#edtNome').value.trim()
+            params.cpf = getNum(pageScreen.querySelector('#edtCPF').value.trim())
+            params.cel = getNum(pageScreen.querySelector('#edtCel').value.trim())
+            params.saldo = pageScreen.querySelector('#edtSaldo').value.trim()
+            params.obs = pageScreen.querySelector('#edtObs').value.trim()
+        const myPromisse = queryDB(params,'CLI-1');
+        myPromisse.then((resolve)=>{
+            const resp = JSON.parse(resolve)[0]
+            setLog(`${newReg?'Novo ': del ? 'Deleção de ' : 'Edição de '}Cliente, Nome: ${params.nome}, CPF: ${params.cpf}, Cel: ${params.cel}, Saldo: ${params.saldo}, Obs: ${params.obs}`)
+
+            if(pageData.hasOwnProperty('callback')){
+                pageData.callback()
+            }
+
+            alert(resp.MESSAGE)
+            closeModal('adm_view_cli')
+        })
+    }
+
+    pageScreen.querySelector('#btnSave').addEventListener('click',()=>{
         if(checkField(['edtNome','edtCPF'])){
-            const params = new Object;
-                params.id = newReg ? 0 : pageData.id
-                params.nome = pageScreen.querySelector('#edtNome').value.trim()
-                params.cpf = getNum(pageScreen.querySelector('#edtCPF').value.trim())
-                params.cel = getNum(pageScreen.querySelector('#edtCel').value.trim())
-                params.saldo = pageScreen.querySelector('#edtSaldo').value.trim()
-                params.obs = pageScreen.querySelector('#edtObs').value.trim()
-            
-            const myPromisse = queryDB(params,'CXA-2');
-            myPromisse.then((resolve)=>{
-                const resp = JSON.parse(resolve)[0]
-                setLog(`${newReg?'Novo Cliente':'Edição de Cliente'} Nome: ${params.nome}, CPF: ${params.cpf}, Cel: ${params.cel}, Saldo: ${params.saldo}, Obs: ${params.obs}`)
+            setCliente()
+        }
+    })
 
-                    if(main_data.hasOwnProperty(pageData.org)){
-                        params.id = resp.id_cliente
-                        main_data[pageData.org].func.newRegent(params)
-                    }else{
-                        console.error('Tela fechada pelo usuário!')
-                    }
+    pageScreen.querySelector('#btnDel').addEventListener('click',()=>{
+        if(confirm('Deseja deletar este cliente?')){
+            setCliente(1)
+        }
+    })
 
-                alert(resp.MESSAGE)
-                closeModal('adm_new_client')
-            })
+    pageScreen.querySelector('#btnEdit').addEventListener('click',()=>{
+        if(pageScreen.querySelector('#btnSave').disabled){
+            if(confirm('Abrir registro para edição?')){
+                openFields(1)
+            }
+        }else{
+            openFields(0)
         }
     })
 

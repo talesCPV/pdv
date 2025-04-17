@@ -50,26 +50,7 @@
             for(let i=0; i<json.length;i++){
                 tbl.plot(json[i],'nome,cpf,cel','Upp,cpf,tel')
             }         
-        });
-    }
-
-    function callback(data){
-        if(main_data.hasOwnProperty(pageData.org)){
-            main_data[pageData.org].func.buscaCliente(data)
-        }else{
-            console.error('Tela fechada pelo usuário!')
-        }
-        closeModal('adm_clientes')
-    }
-
-    pageFunc.newClient = (data)=>{
-        const ok = Object.keys(data).length
-
-        if(ok && main_data.adm_clientes.data.hasOwnProperty('org')){
-            callback(data)
-        }else{
-            pageFunc.fillClient()
-        }
+        })
     }
 
     pageScreen.querySelector('#btnBusca-cli').addEventListener('click',()=>{
@@ -79,17 +60,18 @@
     pageScreen.querySelector('#tblCli').addEventListener('click',(e)=>{
         const row = e.target.parentNode
         if(row.rowIndex > 0 && row.tagName == 'TR'){
-            if(main_data.hasOwnProperty(pageData.org)){
-                callback(row.data)
+            if(pageData.hasOwnProperty('callback')){
+                pageData.callback(row.data)
+                closeModal('adm_clientes')
             }else{
-                row.data.org = 'busca_cliente'
-                openHTML('adm_new_client.html','pop-up','Edição de Cliente',row.data,500)
+                row.data.callback = pageFunc.fillClient
+                openHTML('adm_view_cli.html','pop-up','Edição de Cliente',row.data,700)
             }
         }            
     })
 
     pageScreen.querySelector('#btnNovo').addEventListener('click',()=>{
-        openHTML('adm_view_cli.html','pop-up','Novo Cliente')
+        openHTML('adm_view_cli.html','pop-up','Novo Cliente',{"callback":pageFunc.fillClient})
     })
 
 </script>

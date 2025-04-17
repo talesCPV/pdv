@@ -30,3 +30,13 @@ SELECT * FROM vw_usuario;
 	GROUP BY PROD.id;
     
  SELECT * FROM vw_prod;
+ 
+  DROP VIEW vw_comanda;
+ CREATE VIEW vw_comanda AS     
+	SELECT COM.*, CLI.nome AS cliente, ROUND(IFNULL((SELECT  SUM(qtd * val_unit) FROM tb_item_comanda WHERE id_comanda=COM.id),0),2) AS total
+		FROM tb_comanda AS COM
+        INNER JOIN tb_cliente AS CLI
+        ON COM.id_cliente = CLI.id
+		ORDER BY entrada DESC;
+        
+ SELECT * FROM vw_comanda;

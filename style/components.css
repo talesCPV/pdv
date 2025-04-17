@@ -85,6 +85,7 @@
     .fds-busca{
         container-name : busca;
         container-type: inline-size;
+        padding: 10px;
     }
 
     .fds-busca select{

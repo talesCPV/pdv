@@ -1,0 +1,184 @@
+<template>
+    <style>
+
+        .w70{
+            width: 70% !important;
+        }
+        
+        .line-btn{
+            display: flex;
+            flex-direction: row;
+            gap: 10px;
+        }
+
+        .line-btn button{
+            margin: 0;
+        }
+
+        #btnScanner{
+            display: none;
+        }
+
+        .hide{
+            display: none;
+        }
+        /*  MOBILE  */
+
+        @media all and (max-width : 768px) {
+            .mobiHide{
+                display: none;
+            }
+
+            #btnScanner{
+                display: flex;
+            }
+
+            #card-caixa_comanda #cmbBusca{
+                width: 100%;
+            }
+
+            #card-caixa_comanda #edtBusca{
+                width: 100%;
+            }
+
+            #card-caixa_comanda .line-btn{
+                order: 5;
+                gap: 20px;
+            }
+        }
+
+    </style>
+    <div class="hide">
+        <div id="cli-code"></div>
+        <iframe name="cli-PDF" id="cli-PDF"></iframe>
+    </div>
+
+    <div class="frm-comandas">
+        <fieldset class="fds-busca caixa">
+            <legend>Filtro</legend>
+            <div class="inline">               
+                <select id="cmbBusca">
+                    <option value="id" signal="=">Num. Comanda</option>
+                    <option value="aberta" signal="=" val="1" selected>Comanda Aberta</option>
+                </select>
+                <input type="text" id="edtBusca" onkeypress="return getEnter(event, 'btnBusca-com')">
+                <div class="line-btn">
+                    <button id="btnBusca-com" class="btn-round" ><span class="mdi mdi-magnify"></span></button>
+                    <button id="btnNovo" class="btn-round"><span class="mdi mdi-plus-thick"></span></button>
+                    <button id="btnScanner" class="btn-round"><span class="mdi mdi-qrcode-scan"></span></button>      
+                </div>
+
+            </div>
+        </fieldset>
+        <table id="tblComandas"></table>
+    </div>
+
+
+</template>
+<script>
+    const pageData = main_data.cxa_comanda.data
+    const pageFunc = main_data.cxa_comanda.func
+    const pageScreen = document.querySelector('#card-cxa_comanda')
+//    pageScreen.classList.add('fullscreen')
+
+    function pageStart(){
+        pageFunc.fillComanda()
+
+    }
+
+    pageFunc.fillComanda = ()=>{
+        const tbl = pageScreen.querySelector('#tblComandas')
+        tbl.innerHTML = ''
+        const query = getVal('caixa')    
+        const params = new Object;
+            params.field = query[0]
+            params.signal = query[1]
+            params.value = query[2]
+            params.dt_ini = '2000-01-01'
+            params.dt_fin = '2100-12-31'
+        const myPromisse = queryDB(params,'CXA-0');
+        myPromisse.then((resolve)=>{
+            const json = JSON.parse(resolve)
+console.log(json)            
+            tbl.style.display = json.length > 0 ? 'inline-table' : 'none'
+            tbl.head('Num.,Data|mobiHide,Hora|mobiHide,Cliente|w70,Valor')
+            for(let i=0; i<json.length;i++){
+                tbl.plot(json[i],'id,entrada|mobiHide,entrada|mobiHide,cliente,total','str,dat,hor,Upp,R$.')
+            }
+            
+        })
+    }
+
+    function printComanda(data){
+        const qrcode = new QRCode("cli-code", {
+            text:`https://www.flexibus.com.br/pesqueiro/index.html?token=${data.token.substr(0,30)}`,
+            width: 512,
+            height: 512,
+            colorDark : "#000000",
+            colorLight : "#ffffff",
+            correctLevel : QRCode.CorrectLevel.H,
+            size : 300
+        });
+        console.log(qrcode)
+        comanda_virual(data,'cli-PDF')
+    }
+
+    pageFunc.buscaCliente = (cliente)=>{
+        const params = new Object;
+            params.id = 0
+            params.id_cliente = cliente.id
+            params.obs = ''
+        const myPromisse = queryDB(params,'CXA-3');
+        myPromisse.then((resolve)=>{
+         
+            const json = JSON.parse(resolve)
+  
+            if(json[0].OK=='1'){
+                setLog(`Nova Comanda -> Cliente:${cliente.nome}, CPF:${cliente.cpf}`)
+                pageFunc.fillComanda()
+                
+            }else{
+                alert('Já existe uma comanda aberta para este cliente, favor verificar!')
+            }
+//            printComanda(json[0])
+        })        
+    }
+
+    pageFunc.newComanda = (id_cliente)=>{
+        const params = new Object;
+            params.id = 0
+            params.id_cliente = id_cliente
+            params.obs = ''
+        const myPromisse = queryDB(params,'CXA-1')
+        myPromisse.then((resolve)=>{
+            pageFunc.fillComanda()
+        })
+    }
+
+    pageScreen.querySelector('#btnNovo').addEventListener('click',()=>{
+
+        pageData.callback = (data)=>{
+            pageFunc.newComanda(data.id)
+        }
+
+        openHTML('adm_clientes.html','pop-up','Selecione o Cliente',pageData,800)
+    })
+
+    pageScreen.querySelector('#btnBusca-com').addEventListener('click',()=>{
+        pageFunc.fillComanda()
+    })
+    
+    pageScreen.querySelector('#btnScanner').addEventListener('click',()=>{
+        openHTML('tool_scan_qrcode.html','pop-up','Scanner de QR-Code',{"org":"caixa_comanda"},400)
+    })
+
+    pageScreen.querySelector('#tblComandas').addEventListener('click',(e)=>{
+        const row = e.target.parentNode
+        if(row.rowIndex > 0 && row.tagName == 'TR'){
+            openHTML('cxa_view_comanda.html','pop-up',`Comanda - ${row.data.id.padStart(8,0)} - ${row.data.nome.toUpperCase()}`,row.data)
+        }
+    })
+
+    pageStart()
+
+</script>

@@ -1,0 +1,146 @@
+<template>
+    <style>
+        .fds-itens{
+            display: flex;
+            padding: 10px;
+            flex-wrap: wrap;
+            gap: 15px;
+
+        }
+     
+        #qr_code{
+            border: solid 2px #000000;
+            cursor: pointer;
+            padding: 3px;
+/*            display: none;*/
+        }
+
+        #qr_code:hover{
+            border: solid 2px #FF0000;
+            
+        }
+
+        .hide{
+            display: none;
+        }
+
+        .big{
+            font-size: 2.5em;
+            width: 50px;
+            height: 50px;
+        }
+
+    </style>
+  
+    <fieldset>
+        <legend>Cliente</legend>
+        <table id="tblCliente"></table>
+        <div class="hide">
+            <div id="qr_code"></div>
+            <iframe name="frmPDF" id="frmPDF"></iframe>
+        </div>
+        <div class="line">
+            <button id="btnPrint" class="btn-round big hide" disabled><span class="mdi mdi-printer-pos"></span></button>
+            <button id="btnPDF" class="btn-round big" disabled><span class="mdi mdi-printer-pos"></span></button>
+        </div>
+    </fieldset>
+    <fieldset class="fds-itens">
+        <legend>Ítens</legend>
+        <table id="tblItens"></table>
+        <div class="line">
+            <button id="btnNovo" class="btn-round big" disabled><span class="mdi mdi-plus-circle-outline"></span></button> 
+        </div>
+    </fieldset>
+
+</template>
+<script>
+    const pageData = main_data.cxa_view_comanda.data
+    const pageFunc = main_data.cxa_view_comanda.func
+    const pageScreen = document.querySelector('#card-cxa_view_comanda')
+
+    pageFunc.start = ()=>{
+        pageFunc.fillItemComanda()
+        const tbl = pageScreen.querySelector('#tblCliente')
+        tbl.head('Nome,CPF|mobiHide,Telefone,Saldo')
+        tbl.plot(pageData,'nome,cpf|mobiHide,cel|,saldo|edtSaldo','Upp,cpf,tel,R$.')
+        
+        pageScreen.querySelector('#btnNovo').disabled = pageData.org=='adm_comandas' ? 1 : !Number(pageData.aberta)
+
+        const qrcode = new QRCode("qr_code", {
+            text:`https://www.flexibus.com.br/pesqueiro/index.html?token=${pageData.token.substr(0,20)}`,
+            width: 512,
+            height: 512,
+            colorDark : "#000000",
+            colorLight : "#ffffff",
+            correctLevel : QRCode.CorrectLevel.H,
+            size : 300
+        });
+        
+        delay(100).then(() => {
+            comanda_virual(pageData).then(()=>{
+                pageScreen.querySelector('#frmPDF').src = window.location.href+`config/user/${localStorage.getItem('id_user')}/temp/comanda.pdf`
+                pageScreen.querySelector('#btnPrint').disabled = false
+                pageScreen.querySelector('#btnPDF').disabled = false
+            })
+        })        
+
+//        qrcode.makeCode(`https://www.flexibus.com.br/pesqueiro/index.html?comanda=${pageData.token}`)
+        
+    }
+
+    pageFunc.fillItemComanda = ()=>{
+        const tbl = pageScreen.querySelector('#tblItens')
+        tbl.innerHTML = ''
+        const params = new Object;
+            params.id_comanda = pageData.id
+        const myPromisse = queryDB(params,'CXA-5');
+        myPromisse.then((resolve)=>{
+            const json = JSON.parse(resolve)
+           
+            tbl.style.display = json.length > 0 ? 'inline-table' : 'none'
+            tbl.head('Descrição|w70, Und.|mobiHide,Qtd.,Preço Unt.|mobiHide,Sub_total,PG|mobiHide')
+            let tot = 0
+            for(let i=0; i<json.length;i++){
+                tbl.plot(json[i],'descricao|w70,und|mobiHide,qtd,preco|mobiHide,sub_total,pago|mobiHide','Upp,Upp,str,R$.,R$.,ico 0=mdi-close-thick 1=mdi-check-bold ')
+                tot += json[i].pago == '0' ? parseFloat(json[i].sub_total) : 0
+            }
+            const tr = document.createElement('tr')
+            tr.innerHTML = `<th colspan="2" class="mobiHide"></th><th></th><th>Total</th><th>R$${getFloat(tot.toFixed(2))}</th><th class="mobiHide"></th>`
+            tbl.appendChild(tr)
+        })
+    }
+
+    pageFunc.buscaProd = (prod)=>{
+        prod.org = 'caixa_view_comanda'
+        prod.oper = 'qtd'
+        prod.id_produto = (' ' + prod.id).slice(1) // copia o valor e não a referência
+        prod.id_comanda = pageData.id
+        prod.id = 0
+        prod.qtd = 1
+        openHTML('caixa_view_item_comanda.html','pop-up',`Comanda - ${pageData.id.padStart(8,0)} - ${pageData.nome.toUpperCase()}`,prod,450)       
+    }
+
+    pageScreen.querySelector('#btnPrint').addEventListener('click',()=>{
+        window.frames["frmPDF"].print();
+    })
+
+    pageScreen.querySelector('#btnPDF').addEventListener('click',()=>{
+        window.open(window.location.href+`config/user/${localStorage.getItem('id_user')}/temp/comanda.pdf`, '_blank').focus()
+    })
+
+    pageScreen.querySelector('#btnNovo').addEventListener('click',()=>{
+        pageData.org = 'caixa_view_comanda'
+        openHTML('busca_prod.html','pop-up',`Adicionar produto`,pageData,600)
+    })
+
+    pageScreen.querySelector('#tblItens').addEventListener('click',(e)=>{
+        const row = e.target.parentNode
+        if(row.rowIndex > 0 && row.tagName == 'TR' && pageData.aberta == '1' && pageData.org!='adm_comandas'){
+            row.data.org = 'caixa_view_comanda'
+            openHTML('caixa_view_item_comanda.html','pop-up',`Comanda - ${pageData.id.padStart(8,0)} - ${pageData.nome.toUpperCase()}`,row.data,450)
+        }
+    })
+
+    pageFunc.start()
+
+</script>

@@ -510,26 +510,83 @@ DELIMITER $$
 	BEGIN
 		CALL sp_allow(Iallow,Ihash);
 		IF(@allow)THEN
-			SET @cpf = (SELECT COUNT(*) FROM tb_cliente WHERE cpf COLLATE utf8_general_ci = Icpf COLLATE utf8_general_ci);
-            IF(@cpf = 0)THEN
-				IF(Iid=0)THEN
+			IF(Iid=0)THEN
+				SET @cpf = (SELECT COUNT(*) FROM tb_cliente WHERE cpf COLLATE utf8_general_ci = Icpf COLLATE utf8_general_ci);
+				IF(@cpf = 0)THEN
 					INSERT INTO tb_cliente (nome,cpf,cel,saldo,obs)
 					VALUES (Inome,Icpf,Icel,Isaldo,Iobs);
 					SELECT "Cliente cadastrado com sucesso!" AS MESSAGE, Iid AS id_cliente;
-                ELSE
-					IF(Inome="")THEN
-						DELETE FROM tb_cliente WHERE id=Iid;
-						SELECT "Cliente deletado com sucesso!" AS MESSAGE, Iid AS id_cliente;
-                    ELSE
-						UPDATE tb_cliente 
-                        SET nom=Inome,cpf=Icpf,cel=Icel,saldo=Isaldo,obs=Iobs
-                        WHERE id=Iid;
-						SELECT "Cliente editado com sucesso!" AS MESSAGE, @id AS id_cliente;
-                    END IF;
-                END IF;
+				ELSE
+					SELECT "Cliente já cadastrado!, verificar o CPF" AS MESSAGE,0 AS id_cliente;
+				END IF;                    
 			ELSE
-				SELECT "Cliente já cadastrado!, verificar o CPF" AS MESSAGE,0 AS id_cliente;
+				IF(Inome="")THEN
+					DELETE FROM tb_cliente WHERE id=Iid;
+					SELECT "Cliente deletado com sucesso!" AS MESSAGE, Iid AS id_cliente;
+				ELSE
+					UPDATE tb_cliente 
+					SET nome=Inome,cpf=Icpf,cel=Icel,saldo=Isaldo,obs=Iobs
+					WHERE id=Iid;
+					SELECT "Cliente editado com sucesso!" AS MESSAGE, @id AS id_cliente;
+				END IF;
+			END IF;
+        END IF;
+	END $$
+	DELIMITER ;
+
+/* CAIXA */
+
+ DROP PROCEDURE IF EXISTS sp_view_comandas;
+DELIMITER $$
+	CREATE PROCEDURE sp_view_comandas(
+		IN Iallow varchar(80),
+		IN Ihash varchar(64),
+		IN Ifield varchar(30),
+        IN Isignal varchar(4),
+		IN Ivalue varchar(50),
+        IN Idt_ini date,
+        IN Idt_fin date
+    )
+BEGIN
+		CALL sp_allow(Iallow,Ihash);
+		IF(@allow)THEN
+			
+			SET @quer =CONCAT('SELECT *
+				FROM vw_comanda
+				WHERE ',Ifield,' ',Isignal,' ',Ivalue,'
+				AND entrada >= "',Idt_ini,' 00:00:00"
+				AND entrada <= "',Idt_fin,' 23:59:59"
+				ORDER BY entrada DESC;');            
+
+			PREPARE stmt1 FROM @quer;
+			EXECUTE stmt1;
+        END IF;
+	END $$
+	DELIMITER ;    
+
+     DROP PROCEDURE IF EXISTS sp_set_comanda;
+DELIMITER $$
+	CREATE PROCEDURE sp_set_comanda(
+		IN Iallow varchar(80),
+		IN Ihash varchar(64),
+        IN Iid int(11),
+		IN Iid_cliente INT(11),
+		IN Iobs varchar(255)
+    )
+	BEGIN
+		CALL sp_allow(Iallow,Ihash);
+		IF(@allow)THEN
+            IF(Iid = "0")THEN
+				SET @func = (SELECT id FROM tb_usuario WHERE hash COLLATE utf8_general_ci = Ihash COLLATE utf8_general_ci LIMIT 1);
+				INSERT INTO tb_comanda (id_cliente,id_func,obs) 
+				VALUES(Iid_cliente,@func,Iobs);
+            ELSE
+				IF(Iobs="DELETE")THEN
+					DELETE FROM tb_comanda WHERE id=Iid;
+                ELSE
+					UPDATE tb_comanda SET obs=Iobs WHERE id=Iid;
+                END IF;
             END IF;
         END IF;
 	END $$
-	DELIMITER ;     
+	DELIMITER ;      

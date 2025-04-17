@@ -108,3 +108,33 @@ CREATE TABLE tb_cliente (
   obs varchar(255) DEFAULT NULL,
   PRIMARY KEY (id)
 ) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;
+
+/* COMANDAS */
+
+DROP TABLE IF EXISTS tb_comanda;
+CREATE TABLE tb_comanda (
+  id int(11) NOT NULL AUTO_INCREMENT,
+  entrada datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  aberta boolean NOT NULL DEFAULT 1,
+  id_cliente INT(11) NOT NULL,
+  id_func INT(11) NOT NULL,
+  obs varchar(255) DEFAULT NULL,
+  FOREIGN KEY (id_cliente) REFERENCES tb_cliente(id),
+  FOREIGN KEY (id_func) REFERENCES tb_usuario(id),
+  PRIMARY KEY (id)
+) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS tb_item_comanda;
+CREATE TABLE tb_item_comanda (
+  id int(11) NOT NULL AUTO_INCREMENT,
+  id_comanda INT(11) NOT NULL,
+  registro datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  id_func INT(11) NOT NULL,
+  id_produto INT(11) NOT NULL,
+  val_unit double NOT NULL DEFAULT 0,
+  qtd double NOT NULL DEFAULT 1,
+  FOREIGN KEY (id_comanda) REFERENCES tb_comanda(id),
+  FOREIGN KEY (id_produto) REFERENCES tb_produto(id),
+  FOREIGN KEY (id_func) REFERENCES tb_usuario(id),
+  PRIMARY KEY (id)
+) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;

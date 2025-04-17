@@ -1,0 +1,297 @@
+<template>
+    <style>
+
+        .w70{
+            width: 70% !important;
+        }
+
+        .frm-pdv{
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            width: 100%;
+            height: 100%;
+            overflow-y: scroll;
+        }
+
+        .frm-main{
+            display: flex;
+            flex-direction: row;
+            height: 100%;
+        }
+
+        .sider{
+            height: calc(100% - 50px);
+        }
+
+        .left{
+            min-width: 60%;
+        }
+
+        .fds-cliente{
+            height: 130px;
+        }
+
+        .fds-controle{
+            overflow-y: scroll;
+        }
+
+        .fds-comanda{
+            height: calc(100% - 190px);
+        }
+
+        .fds-button{
+            display: flex;
+            justify-content: center;
+        }
+
+        .fds-button *{
+            min-width: 150px;
+
+        }
+
+        .itens-comanda{
+            overflow-y: scroll;
+            max-height: 100%;
+        }
+
+        #tbl_total{
+            margin-top: 0 !important;
+        }
+
+        #edtSaldo{
+            font-size: 2em;
+            text-align: center;
+            padding: 0;
+        }
+
+        #edtValRec, #edtTroco, #edtTotal{
+            padding: 0;
+            font-size: 2em;
+            text-align: center;
+        } 
+
+        #tblComanda, #tblCliente{
+            font-size: 0.8em;
+        }
+
+        #card-caixa_pdv table{
+            margin-top: -20px;
+        }
+
+        .sider .inline{
+            padding: 5px;
+        }
+
+        /* Media Queries */
+
+        @media all and (max-width : 768px) {
+            .frm-main{
+                flex-wrap: wrap;
+                gap: 15px;
+            }
+
+        }
+
+    </style>
+  
+    <div class="frm-pdv">
+        <div class="frm-main">
+            <div class="sider left">
+                <fieldset class="fds-cliente">
+                    <legend>Cliente</legend>
+                    <table id="tblCliente"></table>
+                </fieldset>
+                <fieldset class="fds-comanda">
+                    <legend>Comanda</legend>
+                    <div class="itens-comanda">
+                        <table id="tblComanda"></table>
+                    </div>
+                </fieldset>
+                <fieldset class="fds-button">
+                    <button id="btnAddItem" disabled><span class="mdi mdi-plus-thick"></span>Adicionar Ítem</button>
+                    <button id="btnComanda"><span class="mdi mdi-magnify"></span> Comandas</button>
+                    <button id="btnPrint"><span class="mdi mdi-printer-pos-outline"></span> Imprimir</button>
+                </fieldset>                
+            </div>
+            <div class="sider">
+                <fieldset class="sider fds-controle">
+                    <legend>Caixa</legend>
+                    <table id="tbl_total"></table>
+                    <div class="inline">
+                        <label for="edtSaldo">Saldo Devido</label>
+                        <input type="text" id="edtSaldo" value="R$0,00" disabled>
+                    </div>
+                    <div class="inline">
+                        <label for="edtValRec">Valor Recebido</label>
+                        <input type="text" id="edtValRec" onfocus="this.select();" onkeyup="valFloat(this)" onkeypress="return event.which== 13 ? troco('edtSaldo','edtValRec','edtTroco','ckbTroco') : null" inputmode="decimal" value="0">
+                    </div>
+                    <div class="inline">
+                        <label for="edtTroco">Troco</label>
+                        <input type="text" id="edtTroco" value="R$0,00" disabled>
+                        <input type="checkbox" id="ckbTroco" title="Troco devolvido para o cliente" checked>
+                    </div>
+                    <div class="inline">
+                        <select id="cmbModoPgto">
+                            <option value="DIN" selected>Dinheiro</option>
+                            <option value="DEB">Cartão de Débito</option>
+                            <option value="CRD">Cartão de Crédito</option>
+                            <option value="PIX">Pix</option>
+                            <option value="CHK">Cheque</option>
+                            <option value="VRF">Vale Refeição</option>
+                            <option value="SLD">Saldo Cliente</option>
+                            <option value="CRT">Cortesia</option>
+                        </select>
+                    </div>
+                </fieldset >
+
+                <fieldset class="fds-button">
+                    <button id="btnParcial" disabled><span class="mdi mdi-cash"></span>Receber Parcial</button>
+                    <button id="btnFinaliza" disabled><span class="mdi mdi-check-bold"></span>Finalizar</button>
+                </fieldset> 
+            </div>            
+        </div>
+    </div>
+
+
+</template>
+<script>
+    const pageData = main_data.cxa_pdv.data
+    const pageFunc = main_data.cxa_pdv.func
+    const pageScreen = document.querySelector('#card-cxa_pdv')
+    pageScreen.classList.add('fullscreen')
+
+    pageFunc.clear =()=>{
+        pageScreen.querySelector('#btnFinaliza').disabled = 1
+        pageScreen.querySelector('#btnParcial').disabled = 1
+        pageScreen.querySelector('#btnAddItem').disabled = 1
+        pageScreen.querySelector('#btnPrint').disabled = 1
+        pageScreen.querySelector('#ckbTroco').checked = 1
+        pageScreen.querySelector('#edtValRec').value = '0'
+        pageScreen.querySelector('#edtTroco').value = 'R$0,00'
+        pageScreen.querySelector('#edtSaldo').value = 'R$0,00'
+        pageScreen.querySelector('#tblCliente').innerHTML = ''
+        pageScreen.querySelector('#tblComanda').innerHTML = ''
+        pageScreen.querySelector('#tbl_total').innerHTML = ''
+    }
+
+    pageFunc.fillItemComanda = ()=>{
+
+        const params = new Object;
+            params.id_comanda = pageData.comanda.id
+        const myPromisse = queryDB(params,'CXA-5');
+        myPromisse.then((resolve)=>{
+            const json = JSON.parse(resolve)
+            pageData.comanda.itens = json
+            const tbl = pageScreen.querySelector('#tblComanda')
+            tbl.style.display = json.length > 0 ? 'inline-table' : 'none'
+            tbl.head('Descrição|w70, Und.|mobiHide,Qtd.,Preço|mobiHide,Sub_total,PG|mobiHide')
+            let tot = 0
+            for(let i=0; i<json.length;i++){
+                tbl.plot(json[i],'descricao|w70,und|mobiHide,qtd,preco|mobiHide,sub_total,pago|mobiHide','Upp,Upp,str,R$.,R$.,ico 0=mdi-close-thick 1=mdi-check-bold ')
+                tot += !Number(json[i].pago) ? parseFloat(json[i].sub_total) : 0
+            }
+            const saldo_dev = (tot - parseFloat(pageData.comanda.pago)).toFixed(2)
+            const tbl_total = pageScreen.querySelector('#tbl_total')
+            tbl_total.head('Valor Comanda, Pago, Total')
+            tbl_total.plot({'total':tot.toFixed(2),'pago':pageData.comanda.pago,'saldo_dev':saldo_dev},'total,pago,saldo_dev','R$.,R$.,R$.')
+
+            pageScreen.querySelector('#edtSaldo').value = `R$${saldo_dev}`
+            pageScreen.querySelector('#edtValRec').value = saldo_dev
+            pageScreen.querySelector('#edtValRec').focus()
+
+        })  
+    }
+
+    pageFunc.finaliza = ()=>{
+
+        troco('edtSaldo','edtValRec','edtTroco','ckbTroco')
+        const saldo_dev = parseFloat(document.querySelector('#edtSaldo').value.substr(2,10))
+        const recebido = parseFloat(document.querySelector('#edtValRec').value)
+        const meutroco = parseFloat(document.querySelector('#edtTroco').value.substr(2,10))
+        const ckb = document.querySelector('#ckbTroco').checked
+
+        const params = new Object;
+            params.id_comanda = pageData.comanda.id
+            params.modo_pgto = pageScreen.querySelector('#cmbModoPgto').value
+            params.valor_pgto = !ckb ? recebido  : meutroco >= 0 ? saldo_dev :  recebido
+            params.saldo_cli = !ckb || meutroco < 0 ? meutroco : 0
+
+        const myPromisse = queryDB(params,'CXA-7');
+        myPromisse.then((resolve)=>{
+            setLog(`Venda lançada -> Comanda:${params.id_comanda}, Valor:${params.valor_pgto}, Modo:${params.modo_pgto}`)
+            pageFunc.clear()
+        })
+    }
+
+    pageFunc.buscaComanda = (data)=>{
+        pageData.comanda = data
+        const tbl_cli = pageScreen.querySelector('#tblCliente')
+        tbl_cli.head('Nome,CPF,Tel,Saldo')
+        tbl_cli.plot(data,'nome,cpf,cel,saldo','Upp,cpf,tel,R$.')
+
+        data.aberta == '1' ? pageScreen.querySelector('#btnFinaliza').disabled = false : null
+        data.aberta == '1' ? pageScreen.querySelector('#btnParcial').disabled = false : null
+
+        pageScreen.querySelector('#edtTroco').value = 'R$0,00'
+        pageScreen.querySelector('#btnAddItem').disabled = false
+        pageScreen.querySelector('#btnPrint').disabled = false
+        
+        pageFunc.fillItemComanda()
+    }
+
+    pageFunc.buscaProd = (prod)=>{
+        prod.qtd = prompt('Quantidade:',1)
+        const params = new Object;
+            params.id = 0
+            params.id_comanda = pageData.comanda.id
+            params.id_prod = prod.id
+            params.qtd = prod.qtd
+            params.pg = 0
+          
+        const myPromisse = queryDB(params,'CXA-4');
+        myPromisse.then((resolve)=>{
+            setLog(`Item Adicionado -> Comanda:${params.id_comanda}, Prod:${prod.descricao}, Qtd.:${prod.qtd}`)
+            pageFunc.fillItemComanda()
+        })
+    }
+
+
+    pageScreen.querySelector('#btnComanda').addEventListener('click',()=>{
+        closeModal('busca_comanda')
+        openHTML('busca_comanda.html','pop-up','Selecione a Comanda',{'org':'caixa_pdv'},800)
+    })
+
+    pageScreen.querySelector('#btnAddItem').addEventListener('click',()=>{
+        pageData.org = 'caixa_pdv'
+        openHTML('busca_prod.html','pop-up',`Adicionar produto`,pageData,600)
+    })
+
+    pageScreen.querySelector('#btnPrint').addEventListener('click',()=>{
+        comanda_itens(pageData.comanda)
+    })
+
+    pageScreen.querySelector('#tblComanda').addEventListener('click',(e)=>{
+        const row = e.target.parentNode
+        if(row.rowIndex > 0 && row.tagName == 'TR'){
+            row.data.org = 'caixa_pdv'
+            openHTML('caixa_view_item_comanda.html','pop-up',`Comanda - ${pageData.comanda.id.padStart(8,0)} - ${pageData.comanda.nome.toUpperCase()}`,row.data,600)
+        }
+    })
+
+    pageScreen.querySelector('#btnFinaliza').addEventListener('click',()=>{
+        if(confirm('Finalizar Comanda?')){
+            pageFunc.finaliza()
+        }
+    })
+
+    pageScreen.querySelector('#btnParcial').addEventListener('click',()=>{
+        closeModal('caixa_pg_parcial')
+        openHTML('caixa_pg_parcial.html','pop-up',`Comanda - ${pageData.comanda.id.padStart(8,0)} - ${pageData.comanda.nome.toUpperCase()}`,pageData.comanda,600)
+    })
+
+    
+
+    pageFunc.clear()
+
+</script>

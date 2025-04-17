@@ -127,12 +127,6 @@ HTMLTableElement.prototype.plot = function(obj, fields,type='',file=false, mark=
                 case 'flo': // Numero Decimal
                     html = obj[arr[0]] != null ? parseFloat(obj[arr[0]]).toFixed(2) : ''
                     break;
-
-                case 'hor': // HORA 00:00
-                    const a = obj[arr[0]] != null ? parseFloat(obj[arr[0]]).toFixed(2) : 0
-                    html =  Math.floor(a).toString().padStart(2,0)+':'+ Math.round(parseFloat((a - Math.floor(a)) * 60)).toString().padStart(2,0)                    
-                    break;
-
                 case 'Upp': // Upper Case
                     html = obj[arr[0]] != null ? obj[arr[0]].toUpperCase().trim() : ''
                     break
@@ -141,7 +135,11 @@ HTMLTableElement.prototype.plot = function(obj, fields,type='',file=false, mark=
                   break;
                 case 'dat': // Formato de Data dia/mes/ano
                     html = obj[arr[0]] != null ? obj[arr[0]].substring(8,10)+'/'+ obj[arr[0]].substring(5,7)+'/'+obj[arr[0]].substring(0,4) : ''
-                    break                 
+                    break
+                case 'hor': // HORA 00:00
+                    html =  obj[arr[0]].substr(10,6)
+                    break;
+
                 case 'Low': // Lower Case
                     html = obj[arr[0]] != null ? obj[arr[0]].toLowerCase().trim() : ''
                     break;
@@ -187,9 +185,15 @@ HTMLTableElement.prototype.plot = function(obj, fields,type='',file=false, mark=
                 case 'cnp': // Formata CNPJ
                     html = obj[arr[0]] != null ? getCNPJ(obj[arr[0]].trim()) : ''
                     break;
+                case 'cpf': // Formata CPF
+                    html = obj[arr[0]] != null ? getCPF(obj[arr[0]].trim()) : ''
+                    break;                    
                 case 'ie.': // Formata Insc. Estadual
                     html = obj[arr[0]] != null ? getIE(obj[arr[0]].trim()) : ''
-                    break;                    
+                    break;
+                case 'tel': // Formata Telefone
+                    html = obj[arr[0]] != null ? getFone(obj[arr[0]].trim()) : ''
+                    break;   
                 case 'btn': // Adiciona Botão
                     op = type[i].split(' ')
                     op = op.length > 1 ? op[1] : 'OK'                
