@@ -7,3 +7,29 @@
 17/04/2025 21:33 tales@planet3.com.br : Novo Cliente, Nome: Tales Cembraneli Dantas, CPF: 26687200879, Cel: 12997113793, Saldo: undefined, Obs: 
 17/04/2025 21:34 tales@planet3.com.br : Edicao de Cliente, Nome: Tales Cembraneli Dantas, CPF: 26687200879, Cel: 12997113793, Saldo: undefined, Obs: obs
 17/04/2025 21:34 tales@planet3.com.br : Novo Cliente, Nome: Fulano de Tal, CPF: 12345678909, Cel: 11985632547, Saldo: undefined, Obs: 
+22/04/2025 20:35 tales@planet3.com.br : Item Adicionado - Coca Cola, Qtd:1, Valor Unit. R$5.00
+22/04/2025 20:43 tales@planet3.com.br : Item Adicionado - Cerveja Heineken 600ml, Qtd:2, Valor Unit. R$10.00
+22/04/2025 20:50 tales@planet3.com.br : Item Editado - Coca Cola, Qtd:2, Valor Unit. R$5
+22/04/2025 20:50 tales@planet3.com.br : Item Editado - Cerveja Heineken 600ml, Qtd:3, Valor Unit. R$10
+22/04/2025 20:50 tales@planet3.com.br : Item Editado - Coca Cola, Qtd:5, Valor Unit. R$5
+22/04/2025 20:58 tales@planet3.com.br : Item Editado - Cerveja Heineken 600ml, Qtd:null, Valor Unit. R$10
+22/04/2025 20:58 tales@planet3.com.br : Item Editado - Coca Cola, Qtd:null, Valor Unit. R$5
+22/04/2025 20:59 tales@planet3.com.br : Item Adicionado - Cerveja Heineken 600ml, Qtd:2, Valor Unit. R$10.00
+22/04/2025 21:00 tales@planet3.com.br : Item Editado - Cerveja Heineken 600ml, Qtd:2, Valor Unit. R$10
+22/04/2025 21:00 tales@planet3.com.br : Item Editado - Cerveja Heineken 600ml, Qtd:null, Valor Unit. R$10
+22/04/2025 21:02 tales@planet3.com.br : Item Adicionado - Coca Cola, Qtd:2, Valor Unit. R$5.00
+22/04/2025 21:03 tales@planet3.com.br : Item Editado - Coca Cola, Qtd:null, Valor Unit. R$5
+22/04/2025 21:03 tales@planet3.com.br : Item Adicionado - Coca Cola, Qtd:3, Valor Unit. R$5.00
+22/04/2025 21:08 tales@planet3.com.br : Item Deletado - Coca Cola, Qtd:0, Valor Unit. R$5
+22/04/2025 21:08 tales@planet3.com.br : Item Adicionado - Coca Cola, Qtd:7, Valor Unit. R$5.00
+22/04/2025 21:08 tales@planet3.com.br : Item Adicionado - Cerveja Heineken 600ml, Qtd:2, Valor Unit. R$10.00
+22/04/2025 21:08 tales@planet3.com.br : Item Editado - Cerveja Heineken 600ml, Qtd:1, Valor Unit. R$10
+22/04/2025 21:09 tales@planet3.com.br : Item Deletado - Cerveja Heineken 600ml, Qtd:0, Valor Unit. R$10
+22/04/2025 21:13 tales@planet3.com.br : Item Adicionado - Coca Cola, Qtd:2, Valor Unit. R$5.00
+22/04/2025 21:13 tales@planet3.com.br : Item Adicionado - Coca Cola, Qtd:1, Valor Unit. R$5.00
+22/04/2025 21:14 tales@planet3.com.br : Item Deletado - Coca Cola, Qtd:0, Valor Unit. R$5
+22/04/2025 21:14 tales@planet3.com.br : Item Adicionado - Cerveja Heineken 600ml, Qtd:1, Valor Unit. R$10.00
+22/04/2025 21:22 tales@planet3.com.br : Item Adicionado - Coca Cola, Qtd:2, Valor Unit. R$5.00
+22/04/2025 21:23 tales@planet3.com.br : Item Adicionado - Cerveja Heineken 600ml, Qtd:2, Valor Unit. R$10.00
+22/04/2025 21:24 tales@planet3.com.br : Item Editado - Coca Cola, Qtd:3, Valor Unit. R$5
+22/04/2025 21:25 tales@planet3.com.br : Item Adicionado - Cerveja Heineken 600ml, Qtd:3, Valor Unit. R$10.00

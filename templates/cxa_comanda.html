@@ -173,7 +173,6 @@
 
     pageScreen.querySelector('#tblComandas').addEventListener('click',(e)=>{
         const row = e.target.parentNode
-        console.log(row.data)
         if(row.rowIndex > 0 && row.tagName == 'TR'){
             openHTML('cxa_view_comanda.html','pop-up',`Comanda - ${row.data.id.padStart(5,0)} - ${row.data.cliente.toUpperCase()}`,row.data)
         }

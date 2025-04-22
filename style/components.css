@@ -333,16 +333,16 @@
 
     #edtBusca{
         order: 5;
-/*        width: 100%;*/
-        width: calc(100% - 140px);
+        width: 100%;
+/*        width: calc(100% - 140px);*/
     }
 
     .fds-busca button{
-        order: 6;
+        order: 3;
     }
 
     .fds-busca select{
-        max-width: unset;
+        max-width: calc(100% - 140px);
 /*        width: calc(100% - 140px);*/
     }
 

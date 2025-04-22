@@ -30,6 +30,14 @@
             height: 50px;
         }
 
+        .center{
+            text-align: center;
+        }
+
+        .total{
+            font-size: 1.5em;
+        }
+
     </style>
   
     <fieldset>
@@ -49,7 +57,7 @@
         <table id="tblItens"></table>
     </fieldset>
     <div class="line">
-        <button id="btnNovo" disabled><span class="mdi mdi-plus-circle-outline"></span> Adicionar Ítem</button> 
+        <button id="btnAddItem" disabled><span class="mdi mdi-plus-circle-outline"></span> Adicionar Ítem</button> 
     </div>
 
 </template>
@@ -64,7 +72,7 @@
         tbl.head('Nome,CPF|mobiHide,Telefone')
         tbl.plot(pageData,'cliente,cpf|mobiHide,cel|','Upp,cpf,tel')
         
-        pageScreen.querySelector('#btnNovo').disabled = pageData.org=='adm_comandas' ? 1 : !Number(pageData.aberta)
+        pageScreen.querySelector('#btnAddItem').disabled = !Number(pageData.aberta)
 
 /*        
         const qrcode = new QRCode("qr_code", {
@@ -98,29 +106,33 @@
             params.id_comanda = pageData.id
         const myPromisse = queryDB(params,'CXA-2');
         myPromisse.then((resolve)=>{
-            const json = JSON.parse(resolve)
-           
+            const json = JSON.parse(resolve)    
             tbl.style.display = json.length > 0 ? 'inline-table' : 'none'
-            tbl.head('Descrição|w70, Und.|mobiHide,Qtd.,Preço Unt.|mobiHide,Sub_total,PG|mobiHide')
+            tbl.head('Descrição|w70, Und.|mobiHide,Qtd.|center,Preço Unt.|center,Sub_total|center')
             let tot = 0
             for(let i=0; i<json.length;i++){
-                tbl.plot(json[i],'descricao|w70,und|mobiHide,qtd,preco|mobiHide,sub_total,pago|mobiHide','Upp,Upp,str,R$.,R$.,ico 0=mdi-close-thick 1=mdi-check-bold ')
-                tot += json[i].pago == '0' ? parseFloat(json[i].sub_total) : 0
+                tbl.plot(json[i],'descricao|w70,und|mobiHide,qtd|center,preco|center,sub_total|center','Upp,Upp,str,R$.,R$.')
+                tot += Number(json[i].sub_total)
             }
             const tr = document.createElement('tr')
-            tr.innerHTML = `<th colspan="2" class="mobiHide"></th><th></th><th>Total</th><th>R$${getFloat(tot.toFixed(2))}</th><th class="mobiHide"></th>`
+            tr.innerHTML = `<th class="mobiHide"></th><th colspan="2"></th><th class="total">Total</th><th class="total">R$${getFloat(tot.toFixed(2))}</th>`
             tbl.appendChild(tr)
         })
     }
 
-    pageFunc.buscaProd = (prod)=>{
-        prod.org = 'caixa_view_comanda'
-        prod.oper = 'qtd'
-        prod.id_produto = (' ' + prod.id).slice(1) // copia o valor e não a referência
-        prod.id_comanda = pageData.id
-        prod.id = 0
-        prod.qtd = 1
-        openHTML('caixa_view_item_comanda.html','pop-up',`Comanda - ${pageData.id.padStart(8,0)} - ${pageData.nome.toUpperCase()}`,prod,450)       
+    pageFunc.setItemComanda = (obj)=>{
+        const params = new Object;
+            params.id = obj.id
+            params.id_comanda = pageData.id
+            params.id_produto = obj.id_produto
+            params.val_unit = obj.val_unit
+            params.qtd = obj.qtd
+        const myPromisse = queryDB(params,'CXA-3');
+        myPromisse.then((resolve)=>{
+            setLog(`Item ${obj.qtd==0 ? 'Deletado': obj.id==0 ? 'Adicionado':'Editado'} - ${obj.descricao}, Qtd:${obj.qtd}, Valor Unit. R$${obj.val_unit}`)
+            pageFunc.fillItemComanda()
+            main_data.cxa_comanda.func.fillComanda()
+        })
     }
 
     pageScreen.querySelector('#btnPrint').addEventListener('click',()=>{
@@ -131,16 +143,31 @@
         window.open(window.location.href+`config/user/${localStorage.getItem('id_user')}/temp/comanda.pdf`, '_blank').focus()
     })
 
-    pageScreen.querySelector('#btnNovo').addEventListener('click',()=>{
-        pageData.org = 'caixa_view_comanda'
-        openHTML('busca_prod.html','pop-up',`Adicionar produto`,pageData,600)
+    pageScreen.querySelector('#btnAddItem').addEventListener('click',()=>{
+        pageData.callback = (data)=>{
+            const item = new Object
+                item.id = 0
+                item.id_produto = data.id
+                item.val_unit = data.preco
+                item.qtd = getFloat(prompt(`${data.descricao} - Digite a quantidade:`))
+                item.descricao = data.descricao
+            if(item.qtd!=null){
+                pageFunc.setItemComanda(item)
+            }
+        }
+        openHTML('adm_produtos.html','pop-up',`Adicionar produto`,pageData,600)
     })
 
     pageScreen.querySelector('#tblItens').addEventListener('click',(e)=>{
         const row = e.target.parentNode
-        if(row.rowIndex > 0 && row.tagName == 'TR' && pageData.aberta == '1' && pageData.org!='adm_comandas'){
-            row.data.org = 'caixa_view_comanda'
-            openHTML('caixa_view_item_comanda.html','pop-up',`Comanda - ${pageData.id.padStart(8,0)} - ${pageData.nome.toUpperCase()}`,row.data,450)
+        if(typeof(row.data) == "object"){
+            const qtd = Number(row.data.qtd)
+            row.data.qtd = prompt(`${row.data.descricao} - Digite a quantidade:`,row.data.qtd)
+            if(row.data.qtd!=null){
+                pageFunc.setItemComanda(row.data)
+            }else{
+                row.data.qtd = qtd
+            }
         }
     })
 

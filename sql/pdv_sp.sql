@@ -576,12 +576,16 @@ DELIMITER $$
 		CALL sp_allow(Iallow,Ihash);
 		IF(@allow)THEN
             IF(Iid = "0")THEN
-				SET @func = (SELECT id FROM tb_usuario WHERE hash COLLATE utf8_general_ci = Ihash COLLATE utf8_general_ci LIMIT 1);
-				INSERT INTO tb_comanda (id_cliente,id_func,obs) 
-				VALUES(Iid_cliente,@func,Iobs);
+				SET @aberta = (SELECT COUNT(*) FROM tb_comanda WHERE aberta=1 AND id_cliente=Iid_cliente);
+                IF(@aberta = 0)THEN
+					SET @func = (SELECT id FROM tb_usuario WHERE hash COLLATE utf8_general_ci = Ihash COLLATE utf8_general_ci LIMIT 1);				
+					INSERT INTO tb_comanda (id_cliente,id_func,obs) 
+					VALUES(Iid_cliente,@func,Iobs);
+                END IF;
             ELSE
 				IF(Iobs="DELETE")THEN
 					DELETE FROM tb_comanda WHERE id=Iid;
+                    DELETE FROM tb_item_comanda WHERE id_comanda=Iid;
                 ELSE
 					UPDATE tb_comanda SET obs=Iobs WHERE id=Iid;
                 END IF;
@@ -603,4 +607,37 @@ DELIMITER $$
 			SELECT * FROM vw_item_comanda WHERE id_comanda=Iid_comanda;
         END IF;
 	END $$
-	DELIMITER ;   
+	DELIMITER ;
+    
+     DROP PROCEDURE IF EXISTS sp_set_item_comanda;
+DELIMITER $$
+	CREATE PROCEDURE sp_set_item_comanda(
+		IN Iallow varchar(80),
+		IN Ihash varchar(64),
+        IN Iid int(11),
+		IN Iid_comanda INT(11),
+		IN Iid_produto INT(11),
+        IN Ival_unit double,
+		IN Iqtd double
+    )
+	BEGIN
+		CALL sp_allow(Iallow,Ihash);
+		IF(@allow)THEN
+			SET @aberta = (SELECT aberta FROM tb_comanda WHERE id=Iid_comanda);
+            IF(@aberta)THEN
+				SET @id = (SELECT IF(COUNT(id)=0,"DEFAULT",id) FROM tb_item_comanda WHERE id=Iid);
+				IF(Iqtd=0)THEN
+					DELETE FROM tb_item_comanda WHERE id=Iid;
+                ELSE
+					IF(Iid=0)THEN
+						SET @call_id = (SELECT IFNULL(id,0) FROM tb_usuario WHERE hash COLLATE utf8_general_ci = Ihash COLLATE utf8_general_ci LIMIT 1);
+						INSERT INTO tb_item_comanda (id_comanda,id_func,id_produto,val_unit,qtd)
+						VALUES (Iid_comanda,@call_id,Iid_produto,Ival_unit,Iqtd);
+					ELSE
+						UPDATE tb_item_comanda SET val_unit=Ival_unit, qtd=Iqtd WHERE id=Iid;
+					END IF;
+                END IF;
+			END IF;
+        END IF;
+	END $$
+	DELIMITER ;    
