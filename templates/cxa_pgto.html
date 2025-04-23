@@ -1,0 +1,37 @@
+<template>
+    <style></style>
+
+    <div class="inline">
+        <label for="cmbModoPgto">Modo Pgto</label>
+        <select id="cmbModoPgto">
+            <option value="DIN" selected>Dinheiro</option>
+            <option value="DEB">Cartão de Débito</option>
+            <option value="CRD">Cartão de Crédito</option>
+            <option value="PIX">Pix</option>
+            <option value="CHK">Cheque</option>
+            <option value="VRF">Vale Refeição</option>
+            <option value="SLD">Saldo Cliente</option>
+            <option value="CRT">Cortesia</option>
+        </select>
+    </div>
+
+    <div></div>
+
+
+
+</template>
+<script>
+    const pageData = main_data.cxa_pgto.data
+    const pageFunc = main_data.cxa_pgto.func
+    const pageScreen = document.querySelector('#card-cxa_pgto')
+
+    function pageStart(){
+
+        console.log(pageData)
+
+    }
+
+
+    pageStart()
+
+</script>

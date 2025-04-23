@@ -130,23 +130,12 @@
                         <label for="edtTroco">Troco</label>
                         <input type="text" id="edtTroco" value="R$0,00" disabled>
                     </div>
-                    <div class="inline">
-                        <select id="cmbModoPgto">
-                            <option value="DIN" selected>Dinheiro</option>
-                            <option value="DEB">Cartão de Débito</option>
-                            <option value="CRD">Cartão de Crédito</option>
-                            <option value="PIX">Pix</option>
-                            <option value="CHK">Cheque</option>
-                            <option value="VRF">Vale Refeição</option>
-                            <option value="SLD">Saldo Cliente</option>
-                            <option value="CRT">Cortesia</option>
-                        </select>
-                    </div>
+
                 </fieldset >
 
                 <fieldset class="fds-button">
-                    <button id="btnParcial" disabled><span class="mdi mdi-cash"></span>Receber Parcial</button>
-                    <button id="btnFinaliza" disabled><span class="mdi mdi-check-bold"></span>Finalizar</button>
+<!--                    <button id="btnParcial" disabled><span class="mdi mdi-cash"></span>Receber Parcial</button> -->
+                    <button id="btnFinaliza" disabled><span class="mdi mdi-check-bold"></span>Receber</button>
                 </fieldset> 
             </div>            
         </div>
@@ -167,7 +156,7 @@
 
     pageFunc.clear =()=>{
         pageScreen.querySelector('#btnFinaliza').disabled = 1
-        pageScreen.querySelector('#btnParcial').disabled = 1
+//        pageScreen.querySelector('#btnParcial').disabled = 1
         pageScreen.querySelector('#btnAddItem').disabled = 1
         pageScreen.querySelector('#btnPrint').disabled = 1
         pageScreen.querySelector('#edtValRec').value = '0'
@@ -185,7 +174,7 @@
         tbl_cli.plot(data,'cliente,cpf,cel','Upp,cpf,tel')
 
         data.aberta == '1' ? pageScreen.querySelector('#btnFinaliza').disabled = false : null
-        data.aberta == '1' ? pageScreen.querySelector('#btnParcial').disabled = false : null
+//        data.aberta == '1' ? pageScreen.querySelector('#btnParcial').disabled = false : null
 
         pageScreen.querySelector('#edtTroco').value = 'R$0,00'
         pageScreen.querySelector('#btnAddItem').disabled = false
@@ -297,16 +286,20 @@
     })
 
     pageScreen.querySelector('#btnFinaliza').addEventListener('click',()=>{
+        openHTML('cxa_pgto.html','pop-up','Fechar Comanda',pageData.comanda,600)
+/*        
         if(confirm('Finalizar Comanda?')){
             pageFunc.finaliza()
         }
+*/
     })
 
+/*    
     pageScreen.querySelector('#btnParcial').addEventListener('click',()=>{
         closeModal('caixa_pg_parcial')
         openHTML('caixa_pg_parcial.html','pop-up',`Comanda - ${pageData.comanda.id.padStart(8,0)} - ${pageData.comanda.nome.toUpperCase()}`,pageData.comanda,600)
     })
-
+*/
 
     pageStart()
 

@@ -430,11 +430,6 @@ function TestaCPF(strCPF) {
 /* CAIXA */
 
 function troco(id_valor,id_din,id_troco){
-
-    console.log(Number(document.getElementById(id_din).value), Number(document.getElementById(id_valor).value))
-
-    const troco = Number(document.getElementById(id_din).value) - Number(document.getElementById(id_valor).value)
-    document.getElementById(id_troco).value = troco
-
-
+    const troco = (Number(document.getElementById(id_din).value) - Number(getFloat(document.getElementById(id_valor).value))).toFixed(2)
+    document.getElementById(id_troco).value = `R$${troco}`
 }
