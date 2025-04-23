@@ -71,7 +71,7 @@
             text-align: center;
         } 
 
-        #tblComanda, #tblCliente{
+        #tblItens, #tblCliente{
             font-size: 0.8em;
         }
 
@@ -105,7 +105,7 @@
                 <fieldset class="fds-comanda">
                     <legend>Comanda</legend>
                     <div class="itens-comanda">
-                        <table id="tblComanda"></table>
+                        <table id="tblItens"></table>
                     </div>
                 </fieldset>
                 <fieldset class="fds-button">
@@ -124,12 +124,11 @@
                     </div>
                     <div class="inline">
                         <label for="edtValRec">Valor Recebido</label>
-                        <input type="text" id="edtValRec" onfocus="this.select();" onkeyup="valFloat(this)" onkeypress="return event.which== 13 ? troco('edtSaldo','edtValRec','edtTroco','ckbTroco') : null" inputmode="decimal" value="0">
+                        <input type="text" id="edtValRec" onfocus="this.select();" onkeyup="valFloat(this)" onkeypress="return event.which== 13 ? troco('edtSaldo','edtValRec','edtTroco') : null" inputmode="decimal" value="0">
                     </div>
                     <div class="inline">
                         <label for="edtTroco">Troco</label>
                         <input type="text" id="edtTroco" value="R$0,00" disabled>
-                        <input type="checkbox" id="ckbTroco" title="Troco devolvido para o cliente" checked>
                     </div>
                     <div class="inline">
                         <select id="cmbModoPgto">
@@ -171,83 +170,12 @@
         pageScreen.querySelector('#btnParcial').disabled = 1
         pageScreen.querySelector('#btnAddItem').disabled = 1
         pageScreen.querySelector('#btnPrint').disabled = 1
-        pageScreen.querySelector('#ckbTroco').checked = 1
         pageScreen.querySelector('#edtValRec').value = '0'
         pageScreen.querySelector('#edtTroco').value = 'R$0,00'
         pageScreen.querySelector('#edtSaldo').value = 'R$0,00'
         pageScreen.querySelector('#tblCliente').innerHTML = ''
-        pageScreen.querySelector('#tblComanda').innerHTML = ''
+        pageScreen.querySelector('#tblItens').innerHTML = ''
         pageScreen.querySelector('#tbl_total').innerHTML = ''
-    }
-
-    pageFunc.fillItemComanda = ()=>{
-
-        const params = new Object;
-            params.id_comanda = pageData.comanda.id
-        const myPromisse = queryDB(params,'CXA-2');
-        myPromisse.then((resolve)=>{
-            const json = JSON.parse(resolve)
-            pageData.comanda.itens = json
-            const tbl = pageScreen.querySelector('#tblComanda')
-            tbl.style.display = json.length > 0 ? 'inline-table' : 'none'
-            tbl.head('Descrição|w70, Und.|mobiHide,Qtd.,Preço|mobiHide,Sub_total')
-            for(let i=0; i<json.length;i++){
-                tbl.plot(json[i],'descricao|w70,und|mobiHide,qtd,preco|mobiHide,sub_total','Upp,Upp,str,R$.,R$.')
-            }
-            const saldo_dev = (Number(pageData.comanda.total) - Number(pageData.comanda.recebido)).toFixed(2)
-            const tbl_total = pageScreen.querySelector('#tbl_total')
-            tbl_total.head('Valor Comanda, Pago, Total')
-            tbl_total.plot({'total':Number(pageData.comanda.total).toFixed(2),'pago':Number(pageData.comanda.recebido),'saldo_dev':saldo_dev},'total,pago,saldo_dev','R$.,R$.,R$.')
-
-            pageScreen.querySelector('#edtSaldo').value = `R$${saldo_dev}`
-            pageScreen.querySelector('#edtValRec').value = saldo_dev
-            pageScreen.querySelector('#edtValRec').focus()
-
-        })  
-    }
-
-/*
-    pageFunc.fillItemComanda = ()=>{
-        const tbl = pageScreen.querySelector('#tblItens')
-        tbl.innerHTML = ''
-        const params = new Object;
-            params.id_comanda = pageData.id
-        const myPromisse = queryDB(params,'CXA-2');
-        myPromisse.then((resolve)=>{
-            const json = JSON.parse(resolve)
-            tbl.style.display = json.length > 0 ? 'inline-table' : 'none'
-            tbl.head('Descrição|w70, Und.|mobiHide,Qtd.|center,Preço Unt.|center,Sub_total|center')
-            let tot = 0
-            for(let i=0; i<json.length;i++){
-                tbl.plot(json[i],'descricao|w70,und|mobiHide,qtd|center,preco|center,sub_total|center','Upp,Upp,str,R$.,R$.')
-                tot += Number(json[i].sub_total)
-            }
-            const tr = document.createElement('tr')
-            tr.innerHTML = `<th class="mobiHide"></th><th colspan="2"></th><th class="total">Total</th><th class="total">R$${getFloat(tot.toFixed(2))}</th>`
-            tbl.appendChild(tr)
-        })
-    }
-*/
-
-    pageFunc.finaliza = ()=>{
-
-        troco('edtSaldo','edtValRec','edtTroco','ckbTroco')
-        const saldo_dev = parseFloat(document.querySelector('#edtSaldo').value.substr(2,10))
-        const recebido = parseFloat(document.querySelector('#edtValRec').value)
-        const meutroco = parseFloat(document.querySelector('#edtTroco').value.substr(2,10))
-        const ckb = document.querySelector('#ckbTroco').checked
-
-        const params = new Object;
-            params.id_comanda = pageData.comanda.id
-            params.modo_pgto = pageScreen.querySelector('#cmbModoPgto').value
-            params.valor_pgto = !ckb ? recebido  : meutroco >= 0 ? saldo_dev :  recebido
-            params.saldo_cli = !ckb || meutroco < 0 ? meutroco : 0
-
-        const myPromisse = queryDB(params,'CXA-7');
-        myPromisse.then((resolve)=>{
-            setLog(`Venda lançada -> Comanda:${params.id_comanda}, Valor:${params.valor_pgto}, Modo:${params.modo_pgto}`)
-            pageFunc.clear()
-        })
     }
 
     pageFunc.buscaComanda = (data)=>{
@@ -266,46 +194,105 @@
         pageFunc.fillItemComanda()
     }
 
-    pageFunc.buscaProd = (prod)=>{
-        prod.qtd = prompt('Quantidade:',1)
+    pageFunc.fillItemComanda = ()=>{
+
         const params = new Object;
-            params.id = 0
             params.id_comanda = pageData.comanda.id
-            params.id_prod = prod.id
-            params.qtd = prod.qtd
-            params.pg = 0
-          
-        const myPromisse = queryDB(params,'CXA-4');
+        const myPromisse = queryDB(params,'CXA-2');
         myPromisse.then((resolve)=>{
-            setLog(`Item Adicionado -> Comanda:${params.id_comanda}, Prod:${prod.descricao}, Qtd.:${prod.qtd}`)
-            pageFunc.fillItemComanda()
+            const json = JSON.parse(resolve)
+            pageData.comanda.itens = json
+            const tbl = pageScreen.querySelector('#tblItens')
+            tbl.style.display = json.length > 0 ? 'inline-table' : 'none'
+            tbl.head('Descrição|w70, Und.|mobiHide,Qtd.,Preço|mobiHide,Sub_total')
+            let tot = 0
+            for(let i=0; i<json.length;i++){
+                tbl.plot(json[i],'descricao|w70,und|mobiHide,qtd,preco|mobiHide,sub_total','Upp,Upp,str,R$.,R$.')
+                tot += Number(json[i].sub_total)
+            }
+            pageData.comanda.total = tot.toFixed(2)
+            const saldo_dev = (tot - Number(pageData.comanda.recebido)).toFixed(2)
+            const tbl_total = pageScreen.querySelector('#tbl_total')
+            tbl_total.head('Valor Comanda, Pago, Total')
+            tbl_total.plot({'total':pageData.comanda.total,'pago':Number(pageData.comanda.recebido),'saldo_dev':saldo_dev},'total,pago,saldo_dev','R$.,R$.,R$.')
+
+            pageScreen.querySelector('#edtSaldo').value = `R$${saldo_dev}`
+            pageScreen.querySelector('#edtValRec').value = saldo_dev
+            pageScreen.querySelector('#edtValRec').focus()
+
+        })  
+    }
+
+    pageFunc.setItemComanda = (obj)=>{
+        const params = new Object;
+            params.id = obj.id
+            params.id_comanda = pageData.comanda.id
+            params.id_produto = obj.id_produto
+            params.val_unit = obj.val_unit
+            params.qtd = obj.qtd
+        const myPromisse = queryDB(params,'CXA-3');
+        myPromisse.then((resolve)=>{
+            setLog(`Item ${obj.qtd==0 ? 'Deletado': obj.id==0 ? 'Adicionado':'Editado'} - ${obj.descricao}, Qtd:${obj.qtd}, Valor Unit. R$${obj.val_unit}`)
+            pageFunc.buscaComanda(pageData.comanda)            
         })
     }
 
+    pageFunc.finaliza = ()=>{
+
+        troco('edtSaldo','edtValRec','edtTroco')
+        const saldo_dev = parseFloat(document.querySelector('#edtSaldo').value.substr(2,10))
+        const recebido = parseFloat(document.querySelector('#edtValRec').value)
+        const meutroco = parseFloat(document.querySelector('#edtTroco').value.substr(2,10))
+
+        const params = new Object;
+            params.id_comanda = pageData.comanda.id
+            params.modo_pgto = pageScreen.querySelector('#cmbModoPgto').value
+            params.valor_pgto = !ckb ? recebido  : meutroco >= 0 ? saldo_dev :  recebido
+            params.saldo_cli = !ckb || meutroco < 0 ? meutroco : 0
+
+        const myPromisse = queryDB(params,'CXA-7');
+        myPromisse.then((resolve)=>{
+            setLog(`Venda lançada -> Comanda:${params.id_comanda}, Valor:${params.valor_pgto}, Modo:${params.modo_pgto}`)
+            pageFunc.clear()
+        })
+    }
 
     pageScreen.querySelector('#btnComanda').addEventListener('click',()=>{
         pageData.callback = (data)=>{
-            console.log(data)
             pageFunc.buscaComanda(data)
         }
-
         openHTML('cxa_comanda.html','pop-up','Selecione a Comanda',pageData,800)
     })
 
     pageScreen.querySelector('#btnAddItem').addEventListener('click',()=>{
-        pageData.org = 'caixa_pdv'
-        openHTML('busca_prod.html','pop-up',`Adicionar produto`,pageData,600)
+        pageData.callback = (data)=>{
+            const item = new Object
+                item.id = 0
+                item.id_produto = data.id
+                item.val_unit = data.preco
+                item.qtd = getFloat(prompt(`${data.descricao} - Digite a quantidade:`))
+                item.descricao = data.descricao
+            if(item.qtd!=null){
+                pageFunc.setItemComanda(item)
+            }
+        }
+        openHTML('adm_produtos.html','pop-up',`Adicionar produto`,pageData,600)
     })
 
     pageScreen.querySelector('#btnPrint').addEventListener('click',()=>{
         comanda_itens(pageData.comanda)
     })
 
-    pageScreen.querySelector('#tblComanda').addEventListener('click',(e)=>{
+    pageScreen.querySelector('#tblItens').addEventListener('click',(e)=>{
         const row = e.target.parentNode
-        if(row.rowIndex > 0 && row.tagName == 'TR'){
-            row.data.org = 'caixa_pdv'
-            openHTML('caixa_view_item_comanda.html','pop-up',`Comanda - ${pageData.comanda.id.padStart(8,0)} - ${pageData.comanda.nome.toUpperCase()}`,row.data,600)
+        if(typeof(row.data) == "object"){
+            const qtd = Number(row.data.qtd)
+            row.data.qtd = prompt(`${row.data.descricao} - Digite a quantidade:`,row.data.qtd)
+            if(row.data.qtd!=null){
+                pageFunc.setItemComanda(row.data)
+            }else{
+                row.data.qtd = qtd
+            }
         }
     })
 

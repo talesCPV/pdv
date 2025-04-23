@@ -426,3 +426,15 @@ function TestaCPF(strCPF) {
     if (Resto != parseInt(strCPF.substring(10, 11) ) ) return false;
     return true;
 }
+
+/* CAIXA */
+
+function troco(id_valor,id_din,id_troco){
+
+    console.log(Number(document.getElementById(id_din).value), Number(document.getElementById(id_valor).value))
+
+    const troco = Number(document.getElementById(id_din).value) - Number(document.getElementById(id_valor).value)
+    document.getElementById(id_troco).value = troco
+
+
+}
