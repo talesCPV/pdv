@@ -174,7 +174,12 @@
     pageScreen.querySelector('#tblComandas').addEventListener('click',(e)=>{
         const row = e.target.parentNode
         if(row.rowIndex > 0 && row.tagName == 'TR'){
-            openHTML('cxa_view_comanda.html','pop-up',`Comanda - ${row.data.id.padStart(5,0)} - ${row.data.cliente.toUpperCase()}`,row.data)
+            if(pageData.hasOwnProperty('callback')){
+                pageData.callback(row.data)
+                closeModal('cxa_comanda')
+            }else{
+                openHTML('cxa_view_comanda.html','pop-up',`Comanda - ${row.data.id.padStart(5,0)} - ${row.data.cliente.toUpperCase()}`,row.data)
+            }
         }
     })
 

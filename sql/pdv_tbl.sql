@@ -118,6 +118,7 @@ CREATE TABLE tb_comanda (
   id_cliente INT(11) NOT NULL,
   id_func INT(11) NOT NULL,
   obs varchar(255) DEFAULT NULL,
+  recebido double NOT NULL DEFAULT 0,
   FOREIGN KEY (id_cliente) REFERENCES tb_cliente(id),
   FOREIGN KEY (id_func) REFERENCES tb_usuario(id),
   PRIMARY KEY (id)
